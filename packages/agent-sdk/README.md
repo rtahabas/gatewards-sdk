@@ -1,11 +1,11 @@
-# @helix402/agent-sdk
+# @gatewards/agent-sdk
 
 x402 payment SDK for AI agents. Automatic HTTP 402 handling with managed wallets or self-custody.
 
 ## Installation
 
 ```bash
-npm install @helix402/agent-sdk
+npm install @gatewards/agent-sdk
 ```
 
 ## API Key Mode (Recommended)
@@ -13,11 +13,11 @@ npm install @helix402/agent-sdk
 Platform manages your wallet. You only need an API key from the dashboard.
 
 ```typescript
-import { createPaymentClient } from "@helix402/agent-sdk";
+import { createPaymentClient } from "@gatewards/agent-sdk";
 
 const { client, budget } = createPaymentClient({
-  gatewayUrl: "https://api.helix402.com",
-  apiKey: process.env.HELIX_API_KEY,
+  gatewayUrl: "https://api.gatewards.com",
+  apiKey: process.env.GATEWARDS_API_KEY,
   network: "base",
   budgetPolicy: {
     maxSpendPerCall: "1.00", // 1 USDC max per request
@@ -35,7 +35,7 @@ Agent manages its own wallet:
 
 ```typescript
 const { client, signer } = createPaymentClient({
-  gatewayUrl: "https://api.helix402.com",
+  gatewayUrl: "https://api.gatewards.com",
   network: "base",
   privateKey: process.env.AGENT_PRIVATE_KEY,
   rpcUrl: "https://mainnet.base.org",
@@ -45,21 +45,21 @@ const { client, signer } = createPaymentClient({
 
 ## Proxy Mode (Cost Optimizer)
 
-Route every request through the Helix402 gateway's cache — no x402 payment
+Route every request through the Gatewards gateway's cache — no x402 payment
 flow, just response deduplication for idempotent GETs. Drop-in: keep your
 existing axios call sites, flip one flag.
 
 ```typescript
 const { client } = createPaymentClient({
-  gatewayUrl: "https://api.helix402.com",
-  apiKey: process.env.HELIX_API_KEY,
+  gatewayUrl: "https://api.gatewards.com",
+  apiKey: process.env.GATEWARDS_API_KEY,
   network: "base",
   proxy: true, // ← enable proxy mode
   axiosConfig: { baseURL: "https://api.coingecko.com" },
 });
 
 // Same call site as before. Under the hood the SDK sends:
-//   POST https://api.helix402.com/api/v1/proxy
+//   POST https://api.gatewards.com/api/v1/proxy
 //   X-Helix-Target-Url: https://api.coingecko.com/simple/price?ids=bitcoin
 const r = await client.get("/simple/price", { params: { ids: "bitcoin" } });
 
@@ -99,12 +99,12 @@ separate clients.
 ## Error Handling
 
 ```typescript
-import { Helix402Error, ErrorCodes } from "@helix402/agent-sdk";
+import { GatewardsError, ErrorCodes } from "@gatewards/agent-sdk";
 
 try {
   await client.get("/api/data");
 } catch (err) {
-  if (err instanceof Helix402Error) {
+  if (err instanceof GatewardsError) {
     switch (err.code) {
       case ErrorCodes.BUDGET_EXCEEDED:
         console.log("Limit hit:", err.details);
@@ -124,7 +124,7 @@ try {
 
 | Option         | Type    | Required     | Description                                                      |
 | -------------- | ------- | ------------ | ---------------------------------------------------------------- |
-| `gatewayUrl`   | string  | ✅           | Helix402 gateway URL                                             |
+| `gatewayUrl`   | string  | ✅           | Gatewards gateway URL                                             |
 | `network`      | string  | ✅           | `"base"`, `"base-sepolia"`, `"ethereum"`                         |
 | `apiKey`       | string  | ✅\*         | Agent API key (managed mode)                                     |
 | `privateKey`   | string  | ✅\*         | Private key (self-custody)                                       |

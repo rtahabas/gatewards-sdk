@@ -1,6 +1,6 @@
 # 01 — Merchant Hello World
 
-Smallest possible Helix402 merchant: one Express endpoint that returns HTTP 402
+Smallest possible Gatewards merchant: one Express endpoint that returns HTTP 402
 until a paying agent settles on-chain.
 
 ## Run it

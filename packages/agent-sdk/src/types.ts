@@ -1,6 +1,6 @@
 /**
- * @module @helix402/agent-sdk
- * Type definitions for the Helix402 Agent SDK.
+ * @module @gatewards/agent-sdk
+ * Type definitions for the Gatewards Agent SDK.
  */
 
 // ─── Budget ─────────────────────────────────────────────────────
@@ -41,7 +41,7 @@ export interface BudgetGuard {
  * - **Self-custody mode**: Set `privateKey`, `rpcUrl`, `usdcAddress`. Agent signs locally.
  */
 export interface PaymentClientOptions {
-  /** Helix402 gateway URL (required). */
+  /** Gatewards gateway URL (required). */
   gatewayUrl: string;
 
   /** Agent API key for managed wallet mode. Obtained from dashboard. */
@@ -76,7 +76,7 @@ export interface PaymentClientOptions {
   timeoutMs?: number;
 
   /**
-   * Route every request through the Helix402 gateway's `/api/v1/proxy`
+   * Route every request through the Gatewards gateway's `/api/v1/proxy`
    * endpoint — enables response caching + dedup without any x402 payment
    * flow. Requires `apiKey` (proxy auth is agent-based, not wallet-signed).
    * The agent's original `Authorization` header, if any, is forwarded
@@ -174,8 +174,8 @@ export interface X402PaymentRequirements {
 
 // ─── Error Types ────────────────────────────────────────────────
 
-/** Custom error class for Helix402 SDK errors. */
-export class Helix402Error extends Error {
+/** Custom error class for Gatewards SDK errors. */
+export class GatewardsError extends Error {
   public readonly code: string;
   public readonly statusCode?: number;
   public readonly details?: Record<string, unknown>;
@@ -187,7 +187,7 @@ export class Helix402Error extends Error {
     details?: Record<string, unknown>,
   ) {
     super(message);
-    this.name = "Helix402Error";
+    this.name = "GatewardsError";
     this.code = code;
     this.statusCode = statusCode;
     this.details = details;

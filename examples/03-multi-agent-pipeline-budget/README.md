@@ -1,6 +1,6 @@
 # 03 — Multi-Agent Pipeline Budget
 
-The core Helix402 demo: three agents sharing a single pipeline budget. When
+The core Gatewards demo: three agents sharing a single pipeline budget. When
 the aggregate spend hits the pipeline ceiling, **every** agent in that
 pipeline gets blocked on its next call — not just the one that tripped it.
 
@@ -9,7 +9,7 @@ This is the mechanism the landing copy calls "breach once, everyone pauses."
 ## Prerequisites
 
 1. The merchant from [`../01-merchant-hello-world`](../01-merchant-hello-world) running.
-2. In the Helix402 dashboard:
+2. In the Gatewards dashboard:
    - Create a pipeline. Set `daily_limit` low enough that 20-30 calls will
      exceed it (e.g. `"0.20"` USDC at `0.01` USDC per call).
    - Create three agents. Assign all three to the pipeline you just made.

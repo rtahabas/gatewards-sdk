@@ -1,14 +1,14 @@
-# Helix402 SDK
+# Gatewards SDK
 
 **Your agents can't burn more than you let them.**
 
-Official SDKs for [Helix402](https://github.com/rtahabas/helix402) — a pipeline gateway for multi-agent systems. Caps fleet spend, detects runaway loops, dedups duplicate API calls across agents — drop-in proxy, no decorator, no code change inside your agents. Optional on-chain settlement via the open x402 protocol when you need it.
+Official SDKs for [Gatewards](https://github.com/rtahabas/gatewards) — a pipeline gateway for multi-agent systems. Caps fleet spend, detects runaway loops, dedups duplicate API calls across agents — drop-in proxy, no decorator, no code change inside your agents. Optional on-chain settlement via the open x402 protocol when you need it.
 
 ## Why
 
 AI agents fail while continuing to work. A retry loop, a verification chain with no terminator, a tool call that never resolves — these don't crash. They silently compound. One widely-discussed 2025 incident saw four agents stuck in an infinite conversation for eleven days before anyone noticed the invoice.
 
-Dashboards and alerts tell you after it happens. Helix402 stops it mid-chain.
+Dashboards and alerts tell you after it happens. Gatewards stops it mid-chain.
 
 - **Drop-in proxy.** Point your agent at the gateway URL with a bearer token. No decorator, no callback handler, no framework adapter. Works with any framework that makes HTTP calls.
 - **Fleet budget enforcement.** Cap what an entire pipeline of agents can spend. Breach once — every agent in the pipeline pauses.
@@ -23,7 +23,7 @@ The gateway atomically blocks the rest and lands a signed webhook at your
 URL — all in one continuous run:
 
 <p align="center">
-  <img src="./assets/end-to-end-demo.gif" alt="Helix402 end-to-end demo — operator sets cap, fleet works, cap hits, atomic guard fires, signed webhook lands at operator URL" width="780"/>
+  <img src="./assets/end-to-end-demo.gif" alt="Gatewards end-to-end demo — operator sets cap, fleet works, cap hits, atomic guard fires, signed webhook lands at operator URL" width="780"/>
 </p>
 
 The three guards are also runnable in isolation if you want to verify
@@ -36,13 +36,13 @@ call costs $0.10. Total intent: $1.00 — twice the cap. The gateway lets
 through exactly $0.50 worth and blocks the rest, atomically:
 
 <p align="center">
-  <img src="./assets/kill-switch-demo.gif" alt="Helix402 fleet kill switch demo — 10 agents try to spend $1, gateway lets $0.50 through and blocks the rest" width="720"/>
+  <img src="./assets/kill-switch-demo.gif" alt="Gatewards fleet kill switch demo — 10 agents try to spend $1, gateway lets $0.50 through and blocks the rest" width="720"/>
 </p>
 
 ```
 $ npx tsx scripts/demo-budget-enforcement.ts
 
-  Helix402 — Fleet Kill Switch Demo
+  Gatewards — Fleet Kill Switch Demo
 
   You set the cap. Your fleet tries to overrun it.
   Watch the gateway hold the line.
@@ -77,7 +77,7 @@ $ npx tsx scripts/demo-budget-enforcement.ts
 
 The script runs the production guard code against an in-memory store —
 zero network, zero on-chain, ~1 second on a laptop. Source lives in the
-[gateway repo](https://github.com/rtahabas/helix402).
+[gateway repo](https://github.com/rtahabas/gatewards).
 
 ### Multi-agent loop
 
@@ -88,12 +88,12 @@ threshold of 3 in a 60-second window, the gateway lets the first 3 settle
 and rejects the rest:
 
 <p align="center">
-  <img src="./assets/loop-detection-demo.gif" alt="Helix402 multi-agent loop detection demo — 6 agents call the same resource, gateway lets 3 through and blocks the rest" width="720"/>
+  <img src="./assets/loop-detection-demo.gif" alt="Gatewards multi-agent loop detection demo — 6 agents call the same resource, gateway lets 3 through and blocks the rest" width="720"/>
 </p>
 
 The dedup guard runs in the same DB transaction as the settlement insert,
 so concurrent retries can't slip past the threshold. Source: same gateway
-repo, [`scripts/demo-loop-detection.ts`](https://github.com/rtahabas/helix402/blob/main/scripts/demo-loop-detection.ts).
+repo, [`scripts/demo-loop-detection.ts`](https://github.com/rtahabas/gatewards/blob/main/scripts/demo-loop-detection.ts).
 
 ### Operator notification (webhook)
 
@@ -103,12 +103,12 @@ demo intercepts the outbound POST so you can see the exact payload
 your receiver would log:
 
 <p align="center">
-  <img src="./assets/webhook-breach-demo.gif" alt="Helix402 webhook on breach demo — fleet hits cap, gateway delivers HMAC-SHA256 signed POST with the breach payload" width="720"/>
+  <img src="./assets/webhook-breach-demo.gif" alt="Gatewards webhook on breach demo — fleet hits cap, gateway delivers HMAC-SHA256 signed POST with the breach payload" width="720"/>
 </p>
 
 HMAC-SHA256 over the JSON body with a per-pipeline secret (AES-GCM at
 rest), idempotency via `X-Helix-Event-Id`, and SSRF guard on the target
-URL. Source: [`scripts/demo-webhook-on-breach.ts`](https://github.com/rtahabas/helix402/blob/main/scripts/demo-webhook-on-breach.ts).
+URL. Source: [`scripts/demo-webhook-on-breach.ts`](https://github.com/rtahabas/gatewards/blob/main/scripts/demo-webhook-on-breach.ts).
 
 ## Flow
 
@@ -122,24 +122,24 @@ Agent request ──► Gateway: budget + cache check ──► Upstream (or cac
 
 | Package                                             | Description                                                                  | npm                                                                                                                 |
 | --------------------------------------------------- | ---------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
-| [`@helix402/agent-sdk`](./packages/agent-sdk)       | Pipeline gateway client for AI agents — drop-in proxy + budget + dedup cache | [![npm](https://img.shields.io/npm/v/@helix402/agent-sdk)](https://www.npmjs.com/package/@helix402/agent-sdk)       |
-| [`@helix402/merchant-sdk`](./packages/merchant-sdk) | Optional Express middleware — charge for your API on-chain via x402          | [![npm](https://img.shields.io/npm/v/@helix402/merchant-sdk)](https://www.npmjs.com/package/@helix402/merchant-sdk) |
-| [`@helix402/contracts`](./packages/contracts)       | Solidity contracts — used only when x402 settlement mode is on               | [![npm](https://img.shields.io/npm/v/@helix402/contracts)](https://www.npmjs.com/package/@helix402/contracts)       |
+| [`@gatewards/agent-sdk`](./packages/agent-sdk)       | Pipeline gateway client for AI agents — drop-in proxy + budget + dedup cache | [![npm](https://img.shields.io/npm/v/@gatewards/agent-sdk)](https://www.npmjs.com/package/@gatewards/agent-sdk)       |
+| [`@gatewards/merchant-sdk`](./packages/merchant-sdk) | Optional Express middleware — charge for your API on-chain via x402          | [![npm](https://img.shields.io/npm/v/@gatewards/merchant-sdk)](https://www.npmjs.com/package/@gatewards/merchant-sdk) |
+| [`@gatewards/contracts`](./packages/contracts)       | Solidity contracts — used only when x402 settlement mode is on               | [![npm](https://img.shields.io/npm/v/@gatewards/contracts)](https://www.npmjs.com/package/@gatewards/contracts)       |
 
 ## Quick Start
 
 ### Agent (consumer) — proxy mode, default
 
 ```bash
-npm install @helix402/agent-sdk
+npm install @gatewards/agent-sdk
 ```
 
 ```ts
-import { createPaymentClient } from "@helix402/agent-sdk";
+import { createPaymentClient } from "@gatewards/agent-sdk";
 
 const { client } = createPaymentClient({
   gatewayUrl: process.env.HELIX_GATEWAY!,
-  apiKey: process.env.HELIX_API_KEY!,
+  apiKey: process.env.GATEWARDS_API_KEY!,
   proxy: true, // drop-in proxy mode — no on-chain settlement required
   budgetPolicy: {
     maxSpendPerCall: "1.00", // hard cap per request (USD-equivalent)
@@ -152,17 +152,17 @@ const { client } = createPaymentClient({
 const res = await client.get("https://your-upstream.com/api/data?q=...");
 ```
 
-LangChain integration: `import { HelixPaidTool } from "@helix402/agent-sdk/langchain"`.
+LangChain integration: `import { HelixPaidTool } from "@gatewards/agent-sdk/langchain"`.
 
 ### Merchant (API provider) — optional, only when you sell paid APIs via x402
 
 ```bash
-npm install @helix402/merchant-sdk
+npm install @gatewards/merchant-sdk
 ```
 
 ```ts
 import express from "express";
-import { createPaymentRequiredMiddleware } from "@helix402/merchant-sdk";
+import { createPaymentRequiredMiddleware } from "@gatewards/merchant-sdk";
 
 const app = express();
 
@@ -198,8 +198,8 @@ Self-host the gateway free under MIT — every tier feature, no caps, you run th
 ## Development
 
 ```bash
-git clone https://github.com/rtahabas/helix402-sdk.git
-cd helix402-sdk
+git clone https://github.com/rtahabas/gatewards-sdk.git
+cd gatewards-sdk
 npm install --include=dev
 npm run build
 npm test
@@ -209,8 +209,8 @@ Requires Node 20+.
 
 ## Links
 
-- **Gateway + demos:** https://github.com/rtahabas/helix402
-- **Dashboard:** https://helix402.vercel.app
+- **Gateway + demos:** https://github.com/rtahabas/gatewards
+- **Dashboard:** https://gatewards.vercel.app
 
 ## License
 

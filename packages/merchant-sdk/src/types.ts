@@ -1,6 +1,6 @@
 /**
- * @module @helix402/merchant-sdk
- * Type definitions for the Helix402 Merchant SDK.
+ * @module @gatewards/merchant-sdk
+ * Type definitions for the Gatewards Merchant SDK.
  */
 
 import { Request } from "express";

@@ -4,7 +4,7 @@ pragma solidity ^0.8.24;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 /**
- * @title Helix402Router
+ * @title GatewardsRouter
  * @notice Atomic settlement + fee split for x402 payments.
  *
  * Flow (single tx):
@@ -31,7 +31,7 @@ interface IUSDC {
     ) external;
 }
 
-contract Helix402Router {
+contract GatewardsRouter {
     address public immutable usdc;
     address public immutable facilitator;
     address public immutable owner;

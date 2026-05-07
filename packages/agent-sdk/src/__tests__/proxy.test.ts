@@ -2,7 +2,7 @@
 import { describe, it, expect } from "vitest";
 import type { InternalAxiosRequestConfig, AxiosRequestHeaders } from "axios";
 import { createPaymentClient } from "../index";
-import { Helix402Error } from "../types";
+import { GatewardsError } from "../types";
 import { applyProxyRewrite, resolveTargetUrl } from "../proxy";
 
 const GATEWAY = "https://gateway.example.com";
@@ -52,7 +52,7 @@ describe("proxy mode — createPaymentClient validation", () => {
         usdcAddress: "0x" + "b".repeat(40),
         proxy: true,
       }),
-    ).toThrow(Helix402Error);
+    ).toThrow(GatewardsError);
   });
 
   it("attaches request interceptor when proxy=true + apiKey is set", () => {

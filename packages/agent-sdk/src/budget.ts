@@ -7,7 +7,7 @@ import {
   BudgetPolicy,
   BudgetGuard,
   BudgetState,
-  Helix402Error,
+  GatewardsError,
   ErrorCodes,
 } from "./types";
 import { validateAmount, parseUSDC, formatUSDC } from "./validation";
@@ -36,7 +36,7 @@ export function createBudgetGuard(policy: BudgetPolicy = {}): BudgetGuard {
       resetIfNeeded();
       const value = validateAmount(amount);
       if (maxSpendPerCall > 0n && value > maxSpendPerCall) {
-        throw new Helix402Error(
+        throw new GatewardsError(
           `Budget exceeded: per-call max ${formatUSDC(maxSpendPerCall)} USDC, requested ${formatUSDC(value)} USDC`,
           ErrorCodes.BUDGET_EXCEEDED,
           undefined,
@@ -47,7 +47,7 @@ export function createBudgetGuard(policy: BudgetPolicy = {}): BudgetGuard {
         );
       }
       if (dailyLimit > 0n && dailySpent + value > dailyLimit) {
-        throw new Helix402Error(
+        throw new GatewardsError(
           `Budget exceeded: daily limit ${formatUSDC(dailyLimit)} USDC, spent ${formatUSDC(dailySpent)} USDC, requested ${formatUSDC(value)} USDC`,
           ErrorCodes.BUDGET_EXCEEDED,
           undefined,

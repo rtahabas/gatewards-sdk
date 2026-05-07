@@ -1,17 +1,17 @@
 {
-  "name": "@helix402/agent-sdk",
+  "name": "@gatewards/agent-sdk",
   "version": "0.1.0-beta.4",
   "description": "Pipeline gateway client for multi-agent systems — drop-in proxy, budget enforcement, dedup cache (optional x402 settlement)",
-  "author": "Helix402",
+  "author": "Gatewards",
   "license": "Apache-2.0",
-  "homepage": "https://github.com/rtahabas/helix402-sdk/tree/main/packages/agent-sdk",
+  "homepage": "https://github.com/rtahabas/gatewards-sdk/tree/main/packages/agent-sdk",
   "repository": {
     "type": "git",
-    "url": "https://github.com/rtahabas/helix402-sdk.git",
+    "url": "https://github.com/rtahabas/gatewards-sdk.git",
     "directory": "packages/agent-sdk"
   },
   "bugs": {
-    "url": "https://github.com/rtahabas/helix402-sdk/issues"
+    "url": "https://github.com/rtahabas/gatewards-sdk/issues"
   },
   "keywords": [
     "pipeline-gateway",
@@ -26,7 +26,7 @@
     "crewai",
     "x402",
     "usdc",
-    "helix402"
+    "gatewards"
   ],
   "engines": {
     "node": ">=20"

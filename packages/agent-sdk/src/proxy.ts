@@ -1,5 +1,5 @@
 /**
- * Proxy mode — routes every request through the Helix402 gateway's
+ * Proxy mode — routes every request through the Gatewards gateway's
  * `/api/v1/proxy` endpoint so responses can be cached + deduplicated without
  * any x402 payment flow. Installed as a request interceptor instead of a
  * separate axios instance so existing timeout / header / user-config

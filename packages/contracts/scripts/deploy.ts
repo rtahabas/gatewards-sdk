@@ -16,7 +16,7 @@ async function main(): Promise<void> {
   const [deployer, merchant, agent, facilitator] = await ethers.getSigners();
   const network = await ethers.provider.getNetwork();
 
-  console.log("=== Helix402 Local Deployment ===\n");
+  console.log("=== Gatewards Local Deployment ===\n");
   console.log("Network:", network.name, "| Chain ID:", network.chainId.toString());
   console.log("Deployer:", deployer.address);
 
@@ -27,12 +27,12 @@ async function main(): Promise<void> {
   const usdcAddress = await usdc.getAddress();
   console.log("\n✅ MockUSDC deployed:", usdcAddress);
 
-  // 2. Deploy Helix402Router (atomic fee split)
-  const Router = await ethers.getContractFactory("Helix402Router");
+  // 2. Deploy GatewardsRouter (atomic fee split)
+  const Router = await ethers.getContractFactory("GatewardsRouter");
   const router = await Router.deploy(usdcAddress, facilitator.address, 100); // 1% fee
   await router.waitForDeployment();
   const routerAddress = await router.getAddress();
-  console.log("✅ Helix402Router deployed:", routerAddress, "(1% fee →", facilitator.address + ")");
+  console.log("✅ GatewardsRouter deployed:", routerAddress, "(1% fee →", facilitator.address + ")");
 
   // 3. Fund agent with USDC
   const agentFund = 1000n * 10n ** 6n; // 1000 USDC

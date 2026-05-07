@@ -2,7 +2,7 @@
  * Input validation and conversion utilities for the Agent SDK.
  */
 
-import { Helix402Error, ErrorCodes } from "./types";
+import { GatewardsError, ErrorCodes } from "./types";
 import { USDC_DECIMALS, NETWORK_CHAIN_IDS } from "./constants";
 
 const ETH_ADDRESS_REGEX = /^0x[a-fA-F0-9]{40}$/;
@@ -15,7 +15,7 @@ export function validateEthereumAddress(
   fieldName: string,
 ): void {
   if (!ETH_ADDRESS_REGEX.test(address)) {
-    throw new Helix402Error(
+    throw new GatewardsError(
       `Invalid ${fieldName}: must be 0x-prefixed 40-char hex address`,
       ErrorCodes.INVALID_ADDRESS,
     );
@@ -25,7 +25,7 @@ export function validateEthereumAddress(
 /** Validate private key format. */
 export function validatePrivateKey(key: string): void {
   if (!PRIVATE_KEY_REGEX.test(key)) {
-    throw new Helix402Error(
+    throw new GatewardsError(
       "Invalid privateKey: must be 0x-prefixed 64-char hex string",
       ErrorCodes.INVALID_PRIVATE_KEY,
     );
@@ -35,7 +35,7 @@ export function validatePrivateKey(key: string): void {
 /** Validate API key format. */
 export function validateApiKey(key: string): void {
   if (!API_KEY_REGEX.test(key)) {
-    throw new Helix402Error(
+    throw new GatewardsError(
       `Invalid apiKey: must start with "ag_" or "hx_agent_"`,
       ErrorCodes.INVALID_API_KEY,
     );
@@ -47,7 +47,7 @@ export function validateNetwork(network: string): number {
   const chainId = NETWORK_CHAIN_IDS[network];
   if (!chainId) {
     const supported = Object.keys(NETWORK_CHAIN_IDS).join(", ");
-    throw new Helix402Error(
+    throw new GatewardsError(
       `Unknown network: "${network}". Supported: ${supported}`,
       ErrorCodes.INVALID_CONFIG,
     );
@@ -60,15 +60,15 @@ export function validateAmount(amount: string | number): bigint {
   try {
     const value = BigInt(amount);
     if (value <= 0n) {
-      throw new Helix402Error(
+      throw new GatewardsError(
         "Amount must be positive",
         ErrorCodes.INVALID_AMOUNT,
       );
     }
     return value;
   } catch (err) {
-    if (err instanceof Helix402Error) throw err;
-    throw new Helix402Error(
+    if (err instanceof GatewardsError) throw err;
+    throw new GatewardsError(
       `Invalid amount: "${amount}" cannot be converted to BigInt`,
       ErrorCodes.INVALID_AMOUNT,
     );
@@ -88,7 +88,7 @@ export function parseUSDC(amount: string | number): string {
     .slice(0, USDC_DECIMALS);
   const result = BigInt(whole) * BigInt(10 ** USDC_DECIMALS) + BigInt(frac);
   if (result <= 0n) {
-    throw new Helix402Error(
+    throw new GatewardsError(
       `Invalid USDC amount: "${amount}"`,
       ErrorCodes.INVALID_AMOUNT,
     );

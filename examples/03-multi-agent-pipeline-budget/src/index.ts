@@ -1,12 +1,12 @@
 // Three agents, one pipeline, one shared budget.
 //
-// Create three agents in the Helix402 dashboard, assign all three to the SAME
+// Create three agents in the Gatewards dashboard, assign all three to the SAME
 // pipeline, and set the pipeline's daily_limit low (e.g. "0.20" USDC). Paste
 // each agent's API key into .env. Run this file — you'll see the agents
 // drive the pipeline total up in parallel, then get blocked together as soon
 // as one of them trips the ceiling. "Breach once, everyone pauses."
 
-import { createPaymentClient, Helix402Error } from "@helix402/agent-sdk";
+import { createPaymentClient, GatewardsError } from "@gatewards/agent-sdk";
 
 const GATEWAY = process.env.HELIX_GATEWAY_URL ?? "https://api.rtahabas.com";
 const MERCHANT_URL = process.env.MERCHANT_URL;
@@ -27,7 +27,7 @@ if (!MERCHANT_URL || agents.some((a) => !a.apiKey)) {
 const CALLS_PER_AGENT = 20;
 
 function describeError(err: unknown): string {
-  if (err instanceof Helix402Error) return `${err.code}: ${err.message}`;
+  if (err instanceof GatewardsError) return `${err.code}: ${err.message}`;
   if (err instanceof Error) return err.message;
   return String(err);
 }

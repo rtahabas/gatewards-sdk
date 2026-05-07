@@ -1,5 +1,5 @@
 {
-  "name": "@helix402/example-multi-agent-pipeline-budget",
+  "name": "@gatewards/example-multi-agent-pipeline-budget",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -8,7 +8,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@helix402/agent-sdk": "^0.1.0-beta.4"
+    "@gatewards/agent-sdk": "^0.1.0-beta.4"
   },
   "devDependencies": {
     "@types/node": "^20.14.0",
