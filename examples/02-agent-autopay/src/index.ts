@@ -1,16 +1,16 @@
 // Agent that calls a paid merchant endpoint and auto-settles on HTTP 402.
 //
 // Managed-wallet mode: the gateway holds the signing key, you pass an apiKey
-// you got from the Helix402 dashboard. No private keys in your process.
+// you got from the Gatewards dashboard. No private keys in your process.
 
-import { createPaymentClient } from "@helix402/agent-sdk";
+import { createPaymentClient } from "@gatewards/agent-sdk";
 
 const GATEWAY = process.env.HELIX_GATEWAY_URL ?? "https://api.rtahabas.com";
-const API_KEY = process.env.HELIX_API_KEY;
+const API_KEY = process.env.GATEWARDS_API_KEY;
 const MERCHANT_URL = process.env.MERCHANT_URL;
 
 if (!API_KEY || !MERCHANT_URL) {
-  console.error("Set HELIX_API_KEY and MERCHANT_URL — see .env.example.");
+  console.error("Set GATEWARDS_API_KEY and MERCHANT_URL — see .env.example.");
   process.exit(1);
 }
 

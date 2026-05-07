@@ -23,7 +23,7 @@ Package-specific changes are tagged `[agent-sdk]`, `[merchant-sdk]`, or
 
 ### Added
 
-- **[agent-sdk]** Proxy mode — route requests through the Helix402
+- **[agent-sdk]** Proxy mode — route requests through the Gatewards
   gateway cache without triggering x402 settlement. Enable with
   `createPaymentClient({ proxy: true, ... })`. Responses carry
   `x-helix-cache: hit | miss | skip`.
@@ -58,8 +58,8 @@ Initial public release.
 - **[contracts]** `MockUSDC` + Solidity atomic settlement helpers for
   local development and tests.
 
-[Unreleased]: https://github.com/rtahabas/helix402-sdk/compare/v0.1.0-beta.4...HEAD
-[0.1.0-beta.4]: https://github.com/rtahabas/helix402-sdk/releases/tag/v0.1.0-beta.4
-[0.1.0-beta.3]: https://github.com/rtahabas/helix402-sdk/releases/tag/v0.1.0-beta.3
-[0.1.0-beta.2]: https://github.com/rtahabas/helix402-sdk/releases/tag/v0.1.0-beta.2
-[0.1.0-beta.1]: https://github.com/rtahabas/helix402-sdk/releases/tag/v0.1.0-beta.1
+[Unreleased]: https://github.com/rtahabas/gatewards-sdk/compare/v0.1.0-beta.4...HEAD
+[0.1.0-beta.4]: https://github.com/rtahabas/gatewards-sdk/releases/tag/v0.1.0-beta.4
+[0.1.0-beta.3]: https://github.com/rtahabas/gatewards-sdk/releases/tag/v0.1.0-beta.3
+[0.1.0-beta.2]: https://github.com/rtahabas/gatewards-sdk/releases/tag/v0.1.0-beta.2
+[0.1.0-beta.1]: https://github.com/rtahabas/gatewards-sdk/releases/tag/v0.1.0-beta.1

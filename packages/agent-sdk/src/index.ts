@@ -1,5 +1,5 @@
 /**
- * @module @helix402/agent-sdk
+ * @module @gatewards/agent-sdk
  *
  * x402 payment SDK for AI agents.
  * Automatically handles HTTP 402 responses with on-chain USDC settlement.
@@ -15,7 +15,7 @@ import { ethers } from "ethers";
 import {
   PaymentClientOptions,
   PaymentClientResult,
-  Helix402Error,
+  GatewardsError,
   ErrorCodes,
 } from "./types";
 import { createBudgetGuard } from "./budget";
@@ -48,7 +48,7 @@ export {
   SignPaymentResponse,
   X402PaymentRequired,
   X402SettleResponse,
-  Helix402Error,
+  GatewardsError,
   ErrorCodes,
 } from "./types";
 
@@ -74,17 +74,17 @@ export function createPaymentClient(
   } = options;
 
   if (!gatewayUrl)
-    throw new Helix402Error(
+    throw new GatewardsError(
       "gatewayUrl is required",
       ErrorCodes.INVALID_CONFIG,
     );
   if (!apiKey && !privateKey)
-    throw new Helix402Error(
+    throw new GatewardsError(
       "Either apiKey or privateKey is required",
       ErrorCodes.INVALID_CONFIG,
     );
   if (apiKey && privateKey)
-    throw new Helix402Error(
+    throw new GatewardsError(
       "Provide either apiKey or privateKey, not both",
       ErrorCodes.INVALID_CONFIG,
     );
@@ -92,19 +92,19 @@ export function createPaymentClient(
   if (privateKey) {
     validatePrivateKey(privateKey);
     if (!rpcUrl)
-      throw new Helix402Error(
+      throw new GatewardsError(
         "rpcUrl is required for self-custody mode",
         ErrorCodes.INVALID_CONFIG,
       );
     if (!usdcAddress)
-      throw new Helix402Error(
+      throw new GatewardsError(
         "usdcAddress is required for self-custody mode",
         ErrorCodes.INVALID_CONFIG,
       );
     validateEthereumAddress(usdcAddress, "usdcAddress");
   }
   if (!network)
-    throw new Helix402Error(
+    throw new GatewardsError(
       "network is required (e.g. 'base', 'base-sepolia')",
       ErrorCodes.INVALID_CONFIG,
     );
@@ -117,20 +117,20 @@ export function createPaymentClient(
 
   const budget = createBudgetGuard(budgetPolicy);
   const sdkId =
-    (axiosConfig?.headers as Record<string, string>)?.["X-Helix-SDK"] ||
+    (axiosConfig?.headers as Record<string, string>)?.["X-Gatewards-SDK"] ||
     "agent-sdk/0.1.0";
   const client = axios.create({
     timeout: timeoutMs,
     ...axiosConfig,
     headers: {
-      "X-Helix-SDK": sdkId,
+      "X-Gatewards-SDK": sdkId,
       ...((axiosConfig?.headers as Record<string, string>) || {}),
     },
   });
 
   if (proxy) {
     if (!apiKey)
-      throw new Helix402Error(
+      throw new GatewardsError(
         "proxy mode requires apiKey (proxy auth is agent-based, not wallet-signed)",
         ErrorCodes.INVALID_CONFIG,
       );
@@ -158,7 +158,7 @@ export function createPaymentClient(
 
       const paymentReq = parsePaymentRequired(response);
       if (!paymentReq)
-        throw new Helix402Error(
+        throw new GatewardsError(
           "402 response missing payment metadata",
           ErrorCodes.MISSING_PAYMENT_METADATA,
           402,
@@ -220,7 +220,7 @@ export function createPaymentClient(
       );
       if (!settleResponse.settled || !settleResponse.receipt) {
         budget.record(amount);
-        throw new Helix402Error(
+        throw new GatewardsError(
           `Settlement rejected: ${settleResponse.error || "unknown"}`,
           ErrorCodes.SETTLEMENT_REJECTED,
         );

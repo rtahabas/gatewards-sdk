@@ -1,18 +1,18 @@
-# @helix402/merchant-sdk
+# @gatewards/merchant-sdk
 
 x402 payment middleware for Express. Monetize your API with USDC — one line of code.
 
 ## Installation
 
 ```bash
-npm install @helix402/merchant-sdk
+npm install @gatewards/merchant-sdk
 ```
 
 ## Quick Start
 
 ```typescript
 import express from "express";
-import { createPaymentRequiredMiddleware } from "@helix402/merchant-sdk";
+import { createPaymentRequiredMiddleware } from "@gatewards/merchant-sdk";
 
 const app = express();
 
@@ -23,7 +23,7 @@ app.get(
     wallet: "0xYourWallet",
     network: "base",
     gatewayPublicKey: process.env.GATEWAY_JWT_SECRET,
-    facilitatorUrl: "https://api.helix402.com",
+    facilitatorUrl: "https://api.gatewards.com",
   }),
   (req, res) => {
     res.json({

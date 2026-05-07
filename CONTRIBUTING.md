@@ -1,12 +1,12 @@
 # Contributing
 
-Thanks for your interest in contributing to Helix402 SDKs.
+Thanks for your interest in contributing to Gatewards SDKs.
 
 ## Setup
 
 ```bash
-git clone https://github.com/rtahabas/helix402-sdk.git
-cd helix402-sdk
+git clone https://github.com/rtahabas/gatewards-sdk.git
+cd gatewards-sdk
 npm install --include=dev
 ```
 

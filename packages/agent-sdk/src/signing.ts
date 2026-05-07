@@ -5,7 +5,7 @@ import type {
   X402PaymentRequirements,
   SignPaymentResponse,
 } from "./types";
-import { Helix402Error, ErrorCodes } from "./types";
+import { GatewardsError, ErrorCodes } from "./types";
 import { extractErrorMessage } from "./validation";
 import {
   DEFAULT_TIMEOUT_MS,
@@ -61,7 +61,7 @@ export async function requestGatewaySign(
     );
     return resp.data;
   } catch (err: unknown) {
-    throw new Helix402Error(
+    throw new GatewardsError(
       `Signing failed: ${extractErrorMessage(err)}`,
       ErrorCodes.SIGNING_FAILED,
     );
@@ -120,7 +120,7 @@ export async function submitSettlement(
 ): Promise<{ settled: boolean; receipt?: string; error?: string }> {
   try {
     const headers: Record<string, string> = {};
-    if (sdkHeader) headers["X-Helix-SDK"] = sdkHeader;
+    if (sdkHeader) headers["X-Gatewards-SDK"] = sdkHeader;
     const resp = await axios.post(
       `${settleUrl}/x402/settle`,
       { paymentPayload: payload, paymentRequirements: requirements },
@@ -128,7 +128,7 @@ export async function submitSettlement(
     );
     return resp.data;
   } catch (err: unknown) {
-    throw new Helix402Error(
+    throw new GatewardsError(
       `Settlement failed: ${extractErrorMessage(err)}`,
       ErrorCodes.SETTLEMENT_FAILED,
     );

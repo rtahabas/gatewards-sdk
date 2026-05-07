@@ -1,14 +1,14 @@
 # 02 — Agent Auto-Pay
 
 Client side of example 01. The agent hits a 402-protected endpoint, catches
-the `Payment Required` response, settles via the Helix402 gateway, and
+the `Payment Required` response, settles via the Gatewards gateway, and
 retries with the JWT receipt — all in one `client.get(...)` call.
 
 ## Prerequisites
 
 1. The merchant from [`../01-merchant-hello-world`](../01-merchant-hello-world)
    running somewhere reachable from this process.
-2. A Helix402 API key from the dashboard. Managed-wallet mode is easiest
+2. A Gatewards API key from the dashboard. Managed-wallet mode is easiest
    for testing — the gateway holds the signing key on your behalf.
 3. A small balance of test USDC on Base Sepolia for the managed wallet.
 
@@ -16,7 +16,7 @@ retries with the JWT receipt — all in one `client.get(...)` call.
 
 ```bash
 cp .env.example .env
-# edit .env — HELIX_API_KEY and MERCHANT_URL
+# edit .env — GATEWARDS_API_KEY and MERCHANT_URL
 npm install
 npm start
 ```
@@ -46,5 +46,5 @@ activity, no leaked spend.
 ## What's next
 
 See [`../03-multi-agent-pipeline-budget`](../03-multi-agent-pipeline-budget)
-for the core Helix402 demo: three agents sharing a single pipeline budget,
+for the core Gatewards demo: three agents sharing a single pipeline budget,
 and the budget-breach that pauses the whole fleet at once.

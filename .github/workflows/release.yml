@@ -43,21 +43,21 @@ jobs:
       - name: Quality gate — typecheck + unit tests
         run: npm run typecheck && npm run test:unit
 
-      - name: Publish @helix402/merchant-sdk
+      - name: Publish @gatewards/merchant-sdk
         if: inputs.package == 'merchant-sdk' || inputs.package == 'all'
         working-directory: packages/merchant-sdk
         run: |
           npm run build
           npm publish --access public --tag ${{ inputs.tag }}
 
-      - name: Publish @helix402/agent-sdk
+      - name: Publish @gatewards/agent-sdk
         if: inputs.package == 'agent-sdk' || inputs.package == 'all'
         working-directory: packages/agent-sdk
         run: |
           npm run build
           npm publish --access public --tag ${{ inputs.tag }}
 
-      - name: Publish @helix402/contracts
+      - name: Publish @gatewards/contracts
         if: inputs.package == 'contracts' || inputs.package == 'all'
         working-directory: packages/contracts
         run: |

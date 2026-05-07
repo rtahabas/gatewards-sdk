@@ -1,17 +1,17 @@
 /* eslint-disable max-lines */
 /**
- * @module @helix402/agent-sdk/langchain
+ * @module @gatewards/agent-sdk/langchain
  *
- * LangChain tool adapters for Helix402 x402 payments.
+ * LangChain tool adapters for Gatewards x402 payments.
  * Gives any LangChain agent the ability to discover, pay for, and consume paid APIs.
  *
  * @example
  * ```typescript
- * import { createHelix402Tools } from "@helix402/agent-sdk/langchain";
+ * import { createGatewardsTools } from "@gatewards/agent-sdk/langchain";
  *
- * const tools = createHelix402Tools({
- *   gatewayUrl: "https://gateway.helix402.com",
- *   apiKey: process.env.HELIX_API_KEY!,
+ * const tools = createGatewardsTools({
+ *   gatewayUrl: "https://gateway.gatewards.com",
+ *   apiKey: process.env.GATEWARDS_API_KEY!,
  *   network: "base",
  * });
  *
@@ -32,8 +32,8 @@ import type { PaymentClientOptions, PaymentClientResult } from "./types";
 
 // ─── Options ────────────────────────────────────────────────────
 
-export interface Helix402ToolsOptions {
-  /** Helix402 gateway URL. */
+export interface GatewardsToolsOptions {
+  /** Gatewards gateway URL. */
   gatewayUrl: string;
   /** Agent API key (managed wallet mode). */
   apiKey: string;
@@ -48,9 +48,9 @@ export interface Helix402ToolsOptions {
 // ─── Tool Implementations ───────────────────────────────────────
 
 class DiscoverServicesTool extends StructuredTool {
-  name = "helix402_discover_services";
+  name = "gatewards_discover_services";
   description =
-    "Discover available paid API services on the Helix402 marketplace. " +
+    "Discover available paid API services on the Gatewards marketplace. " +
     "Returns service names, descriptions, endpoints, and prices. " +
     "Use this to find what data sources are available before making paid calls.";
   schema = z.object({
@@ -78,9 +78,9 @@ class DiscoverServicesTool extends StructuredTool {
 }
 
 class CallPaidApiTool extends StructuredTool {
-  name = "helix402_call_paid_api";
+  name = "gatewards_call_paid_api";
   description =
-    "Make a paid API call through the Helix402 x402 payment gateway. " +
+    "Make a paid API call through the Gatewards x402 payment gateway. " +
     "Payment is handled automatically — if the API requires payment (HTTP 402), " +
     "USDC is signed and settled on-chain, then the request retries with a receipt. " +
     "The cost is deducted from your agent's budget.";
@@ -141,9 +141,9 @@ class CallPaidApiTool extends StructuredTool {
 }
 
 class CheckBudgetTool extends StructuredTool {
-  name = "helix402_check_budget";
+  name = "gatewards_check_budget";
   description =
-    "Check your current spending budget on Helix402. " +
+    "Check your current spending budget on Gatewards. " +
     "Returns daily spend, daily limit, and remaining budget. " +
     "Use this before expensive calls to make cost-effective decisions.";
   schema = z.object({});
@@ -186,9 +186,9 @@ class CheckBudgetTool extends StructuredTool {
 }
 
 class GetPlansTool extends StructuredTool {
-  name = "helix402_get_plans";
+  name = "gatewards_get_plans";
   description =
-    "List available subscription plans on Helix402. " +
+    "List available subscription plans on Gatewards. " +
     "Plans offer prepaid credits at a fixed price — often cheaper than per-call payments.";
   schema = z.object({
     serviceId: z.string().optional().describe("Filter plans by service ID"),
@@ -212,9 +212,9 @@ class GetPlansTool extends StructuredTool {
 }
 
 class SubscribePlanTool extends StructuredTool {
-  name = "helix402_subscribe";
+  name = "gatewards_subscribe";
   description =
-    "Subscribe to a credit plan on Helix402. " +
+    "Subscribe to a credit plan on Gatewards. " +
     "Purchases a bundle of credits for a service at a fixed USDC price.";
   schema = z.object({
     planId: z.string().describe("The plan ID to subscribe to"),
@@ -246,19 +246,19 @@ class SubscribePlanTool extends StructuredTool {
 // ─── Factory ────────────────────────────────────────────────────
 
 /**
- * Creates a set of LangChain tools that give any agent Helix402 payment capabilities.
+ * Creates a set of LangChain tools that give any agent Gatewards payment capabilities.
  *
  * Returns 5 tools: discover_services, call_paid_api, check_budget, get_plans, subscribe.
  */
-export function createHelix402Tools(
-  options: Helix402ToolsOptions,
+export function createGatewardsTools(
+  options: GatewardsToolsOptions,
 ): StructuredTool[] {
   const paymentOpts: PaymentClientOptions = {
     gatewayUrl: options.gatewayUrl,
     apiKey: options.apiKey,
     network: options.network,
     budgetPolicy: options.budgetPolicy,
-    axiosConfig: { headers: { "X-Helix-SDK": "langchain/0.1.0" } },
+    axiosConfig: { headers: { "X-Gatewards-SDK": "langchain/0.1.0" } },
   };
 
   const payment = createPaymentClient(paymentOpts);

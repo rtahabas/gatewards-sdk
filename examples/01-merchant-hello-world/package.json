@@ -1,5 +1,5 @@
 {
-  "name": "@helix402/example-merchant-hello-world",
+  "name": "@gatewards/example-merchant-hello-world",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -8,7 +8,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@helix402/merchant-sdk": "^0.1.0-beta.4",
+    "@gatewards/merchant-sdk": "^0.1.0-beta.4",
     "express": "^4.19.2"
   },
   "devDependencies": {

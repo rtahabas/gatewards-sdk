@@ -1,17 +1,17 @@
 {
-  "name": "@helix402/merchant-sdk",
+  "name": "@gatewards/merchant-sdk",
   "version": "0.1.0-beta.3",
-  "description": "Optional x402 payment middleware for Express APIs — Helix402 component for on-chain monetization (proxy mode is the default; this is opt-in)",
-  "author": "Helix402",
+  "description": "Optional x402 payment middleware for Express APIs — Gatewards component for on-chain monetization (proxy mode is the default; this is opt-in)",
+  "author": "Gatewards",
   "license": "Apache-2.0",
-  "homepage": "https://github.com/rtahabas/helix402-sdk/tree/main/packages/merchant-sdk",
+  "homepage": "https://github.com/rtahabas/gatewards-sdk/tree/main/packages/merchant-sdk",
   "repository": {
     "type": "git",
-    "url": "https://github.com/rtahabas/helix402-sdk.git",
+    "url": "https://github.com/rtahabas/gatewards-sdk.git",
     "directory": "packages/merchant-sdk"
   },
   "bugs": {
-    "url": "https://github.com/rtahabas/helix402-sdk/issues"
+    "url": "https://github.com/rtahabas/gatewards-sdk/issues"
   },
   "keywords": [
     "x402",
@@ -21,7 +21,7 @@
     "usdc",
     "monetize",
     "api",
-    "helix402"
+    "gatewards"
   ],
   "engines": {
     "node": ">=20"

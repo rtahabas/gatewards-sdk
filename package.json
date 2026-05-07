@@ -1,16 +1,16 @@
 {
-  "name": "@helix402/sdk-monorepo",
+  "name": "@gatewards/sdk-monorepo",
   "version": "0.0.0",
   "private": true,
-  "description": "Helix402 SDKs — pipeline gateway agent client (drop-in proxy, budget, dedup cache) plus optional x402 merchant middleware and supporting contracts",
+  "description": "Gatewards SDKs — pipeline gateway agent client (drop-in proxy, budget, dedup cache) plus optional x402 merchant middleware and supporting contracts",
   "license": "Apache-2.0",
-  "homepage": "https://github.com/rtahabas/helix402-sdk",
+  "homepage": "https://github.com/rtahabas/gatewards-sdk",
   "repository": {
     "type": "git",
-    "url": "https://github.com/rtahabas/helix402-sdk.git"
+    "url": "https://github.com/rtahabas/gatewards-sdk.git"
   },
   "bugs": {
-    "url": "https://github.com/rtahabas/helix402-sdk/issues"
+    "url": "https://github.com/rtahabas/gatewards-sdk/issues"
   },
   "workspaces": [
     "packages/*"

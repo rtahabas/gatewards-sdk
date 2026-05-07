@@ -1,5 +1,5 @@
 /**
- * @module @helix402/merchant-sdk
+ * @module @gatewards/merchant-sdk
  *
  * x402 payment middleware for Express.
  * Returns 402 with PAYMENT-REQUIRED header for unpaid requests.

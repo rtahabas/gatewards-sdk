@@ -1,29 +1,29 @@
 /* eslint-disable max-lines */
 import { describe, it, expect } from "vitest";
 import { createPaymentClient, createBudgetGuard } from "../index";
-import { Helix402Error, ErrorCodes } from "../types";
+import { GatewardsError, ErrorCodes } from "../types";
 
-function expectHelix402Error(fn: () => unknown, code: string): Helix402Error {
+function expectGatewardsError(fn: () => unknown, code: string): GatewardsError {
   try {
     fn();
-    throw new Error("Expected Helix402Error but none was thrown");
+    throw new Error("Expected GatewardsError but none was thrown");
   } catch (err) {
-    expect(err).toBeInstanceOf(Helix402Error);
-    expect((err as Helix402Error).code).toBe(code);
-    return err as Helix402Error;
+    expect(err).toBeInstanceOf(GatewardsError);
+    expect((err as GatewardsError).code).toBe(code);
+    return err as GatewardsError;
   }
 }
 
 describe("Configuration Validation", () => {
   it("throws on missing gatewayUrl", () => {
-    expectHelix402Error(
+    expectGatewardsError(
       () => createPaymentClient({ gatewayUrl: "", network: "base" }),
       ErrorCodes.INVALID_CONFIG,
     );
   });
 
   it("throws when neither apiKey nor privateKey", () => {
-    expectHelix402Error(
+    expectGatewardsError(
       () =>
         createPaymentClient({
           gatewayUrl: "http://localhost:3001",
@@ -34,7 +34,7 @@ describe("Configuration Validation", () => {
   });
 
   it("throws when both apiKey and privateKey provided", () => {
-    expectHelix402Error(
+    expectGatewardsError(
       () =>
         createPaymentClient({
           gatewayUrl: "http://localhost:3001",
@@ -49,7 +49,7 @@ describe("Configuration Validation", () => {
   });
 
   it("throws on invalid apiKey prefix", () => {
-    expectHelix402Error(
+    expectGatewardsError(
       () =>
         createPaymentClient({
           gatewayUrl: "http://localhost:3001",
@@ -61,7 +61,7 @@ describe("Configuration Validation", () => {
   });
 
   it("throws on missing network", () => {
-    expectHelix402Error(
+    expectGatewardsError(
       () =>
         createPaymentClient({
           gatewayUrl: "http://localhost:3001",
@@ -73,7 +73,7 @@ describe("Configuration Validation", () => {
   });
 
   it("throws on unknown network", () => {
-    expectHelix402Error(
+    expectGatewardsError(
       () =>
         createPaymentClient({
           gatewayUrl: "http://localhost:3001",
@@ -103,7 +103,7 @@ describe("Configuration Validation", () => {
   });
 
   it("throws on invalid privateKey format", () => {
-    expectHelix402Error(
+    expectGatewardsError(
       () =>
         createPaymentClient({
           gatewayUrl: "http://localhost:3001",
@@ -117,7 +117,7 @@ describe("Configuration Validation", () => {
   });
 
   it("throws when self-custody missing rpcUrl", () => {
-    expectHelix402Error(
+    expectGatewardsError(
       () =>
         createPaymentClient({
           gatewayUrl: "http://localhost:3001",
@@ -130,7 +130,7 @@ describe("Configuration Validation", () => {
   });
 
   it("throws on invalid usdcAddress", () => {
-    expectHelix402Error(
+    expectGatewardsError(
       () =>
         createPaymentClient({
           gatewayUrl: "http://localhost:3001",
@@ -172,17 +172,17 @@ describe("Budget Guard", () => {
 
   it("throws on negative amount", () => {
     const budget = createBudgetGuard({ maxSpendPerCall: "1.00" });
-    expectHelix402Error(() => budget.check("-1"), ErrorCodes.INVALID_AMOUNT);
+    expectGatewardsError(() => budget.check("-1"), ErrorCodes.INVALID_AMOUNT);
   });
 
   it("throws on zero amount", () => {
     const budget = createBudgetGuard({ maxSpendPerCall: "1.00" });
-    expectHelix402Error(() => budget.check("0"), ErrorCodes.INVALID_AMOUNT);
+    expectGatewardsError(() => budget.check("0"), ErrorCodes.INVALID_AMOUNT);
   });
 
   it("throws on non-numeric amount", () => {
     const budget = createBudgetGuard({ maxSpendPerCall: "1.00" });
-    expectHelix402Error(
+    expectGatewardsError(
       () => budget.check("not-a-number"),
       ErrorCodes.INVALID_AMOUNT,
     );
@@ -190,7 +190,7 @@ describe("Budget Guard", () => {
 
   it("per-call exceed includes USDC details", () => {
     const budget = createBudgetGuard({ maxSpendPerCall: "0.10" }); // 100000 smallest
-    const err = expectHelix402Error(
+    const err = expectGatewardsError(
       () => budget.check("200000"),
       ErrorCodes.BUDGET_EXCEEDED,
     );
@@ -201,7 +201,7 @@ describe("Budget Guard", () => {
   it("daily limit exceed includes cumulative info", () => {
     const budget = createBudgetGuard({ dailyLimit: "0.50" }); // 500000 smallest
     budget.record("300000");
-    const err = expectHelix402Error(
+    const err = expectGatewardsError(
       () => budget.check("300000"),
       ErrorCodes.BUDGET_EXCEEDED,
     );

@@ -1,17 +1,17 @@
 {
-  "name": "@helix402/contracts",
+  "name": "@gatewards/contracts",
   "version": "0.1.0-beta.3",
-  "description": "Helix402 Solidity contracts — atomic settlement + fee split for x402 payments",
-  "author": "Helix402",
+  "description": "Gatewards Solidity contracts — atomic settlement + fee split for x402 payments",
+  "author": "Gatewards",
   "license": "Apache-2.0",
-  "homepage": "https://github.com/rtahabas/helix402-sdk/tree/main/packages/contracts",
+  "homepage": "https://github.com/rtahabas/gatewards-sdk/tree/main/packages/contracts",
   "repository": {
     "type": "git",
-    "url": "https://github.com/rtahabas/helix402-sdk.git",
+    "url": "https://github.com/rtahabas/gatewards-sdk.git",
     "directory": "packages/contracts"
   },
   "bugs": {
-    "url": "https://github.com/rtahabas/helix402-sdk/issues"
+    "url": "https://github.com/rtahabas/gatewards-sdk/issues"
   },
   "keywords": [
     "x402",
@@ -20,7 +20,7 @@
     "usdc",
     "eip-3009",
     "payment",
-    "helix402"
+    "gatewards"
   ],
   "engines": {
     "node": ">=20"
@@ -44,7 +44,7 @@
     "deploy:local": "npx hardhat run scripts/deploy.ts --network localhost",
     "node": "npx hardhat node",
     "build": "npx hardhat compile && npm run build:abi",
-    "build:abi": "node -e \"const fs=require('fs');const path=require('path');fs.mkdirSync('dist',{recursive:true});const abis={Helix402Router:require('./artifacts/contracts/Helix402Router.sol/Helix402Router.json').abi,MockUSDC:require('./artifacts/contracts/MockUSDC.sol/MockUSDC.json').abi};fs.writeFileSync('dist/index.js','module.exports='+JSON.stringify(abis,null,2)+';');fs.writeFileSync('dist/index.d.ts','export declare const Helix402Router: readonly any[];\\nexport declare const MockUSDC: readonly any[];\\n');\""
+    "build:abi": "node -e \"const fs=require('fs');const path=require('path');fs.mkdirSync('dist',{recursive:true});const abis={GatewardsRouter:require('./artifacts/contracts/GatewardsRouter.sol/GatewardsRouter.json').abi,MockUSDC:require('./artifacts/contracts/MockUSDC.sol/MockUSDC.json').abi};fs.writeFileSync('dist/index.js','module.exports='+JSON.stringify(abis,null,2)+';');fs.writeFileSync('dist/index.d.ts','export declare const GatewardsRouter: readonly any[];\\nexport declare const MockUSDC: readonly any[];\\n');\""
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^4.0.0",
