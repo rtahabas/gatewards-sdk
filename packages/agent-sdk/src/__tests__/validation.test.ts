@@ -102,6 +102,15 @@ describe("Configuration Validation", () => {
     expect(client).toBeDefined();
   });
 
+  it("accepts gw_agent_ prefixed apiKey (current gateway format)", () => {
+    const { client } = createPaymentClient({
+      gatewayUrl: "http://localhost:3001",
+      network: "base",
+      apiKey: "gw_agent_0123456789abcdef0123456789abcdef",
+    });
+    expect(client).toBeDefined();
+  });
+
   it("throws on invalid privateKey format", () => {
     expectGatewardsError(
       () =>

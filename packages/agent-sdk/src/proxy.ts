@@ -8,8 +8,8 @@
 import type { InternalAxiosRequestConfig } from "axios";
 
 const PROXY_PATH = "/api/v1/proxy";
-const TARGET_HEADER = "X-Helix-Target-Url";
-const UPSTREAM_AUTH_HEADER = "X-Helix-Upstream-Auth";
+const TARGET_HEADER = "X-Gatewards-Target-Url";
+const UPSTREAM_AUTH_HEADER = "X-Gatewards-Upstream-Auth";
 
 /**
  * Builds the fully-qualified URL the upstream would have received if the
@@ -44,7 +44,7 @@ function joinUrl(base: string, path: string): string {
 /**
  * Rewrites an outgoing request in-place so it hits the gateway's proxy
  * endpoint with the correct auth + target metadata. Also promotes the
- * caller's `Authorization` (if any) to `X-Helix-Upstream-Auth` so the
+ * caller's `Authorization` (if any) to `X-Gatewards-Upstream-Auth` so the
  * upstream still receives the right credential after the gateway swaps
  * in the agent key.
  */

@@ -7,7 +7,7 @@ import { USDC_DECIMALS, NETWORK_CHAIN_IDS } from "./constants";
 
 const ETH_ADDRESS_REGEX = /^0x[a-fA-F0-9]{40}$/;
 const PRIVATE_KEY_REGEX = /^0x[a-fA-F0-9]{64}$/;
-const API_KEY_REGEX = /^(ag_|hx_agent_)[a-zA-Z0-9]+$/;
+const API_KEY_REGEX = /^(gw_agent_|ag_|hx_agent_)[a-zA-Z0-9]+$/;
 
 /** Validate Ethereum address format. */
 export function validateEthereumAddress(
@@ -36,7 +36,7 @@ export function validatePrivateKey(key: string): void {
 export function validateApiKey(key: string): void {
   if (!API_KEY_REGEX.test(key)) {
     throw new GatewardsError(
-      `Invalid apiKey: must start with "ag_" or "hx_agent_"`,
+      `Invalid apiKey: must start with "gw_agent_", "ag_", or "hx_agent_"`,
       ErrorCodes.INVALID_API_KEY,
     );
   }
