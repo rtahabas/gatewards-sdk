@@ -60,11 +60,11 @@ const { client } = createPaymentClient({
 
 // Same call site as before. Under the hood the SDK sends:
 //   POST https://api.gatewards.com/api/v1/proxy
-//   X-Helix-Target-Url: https://api.coingecko.com/simple/price?ids=bitcoin
+//   X-Gatewards-Target-Url: https://api.coingecko.com/simple/price?ids=bitcoin
 const r = await client.get("/simple/price", { params: { ids: "bitcoin" } });
 
 // Gateway annotates every response:
-r.headers["x-helix-cache"]; // "hit" | "miss" | "skip"
+r.headers["x-gatewards-cache"]; // "hit" | "miss" | "skip"
 ```
 
 **When to use.** Multi-agent stacks that call the same upstream resources
@@ -73,8 +73,8 @@ fetches). One agent's fetch populates the cache; the next N agents in
 your pipeline get the cached response with no upstream call.
 
 **Per-call upstream auth.** If you need to pass an auth header to the
-upstream (not to Helix), set `Authorization` as usual — the SDK promotes
-it to `X-Helix-Upstream-Auth` before the gateway swaps in the agent key:
+upstream (not to Gatewards), set `Authorization` as usual — the SDK promotes
+it to `X-Gatewards-Upstream-Auth` before the gateway swaps in the agent key:
 
 ```typescript
 await client.get("/me", {
@@ -87,7 +87,7 @@ await client.get("/me", {
 - Only `GET` responses are cached. `POST`/`PUT`/`DELETE` pass through
   without dedup — mutations must never be replayed from cache.
 - Only `200` responses are stored. Other statuses stream through with
-  `x-helix-cache: skip`.
+  `x-gatewards-cache: skip`.
 - `text/event-stream` and other streaming bodies are not buffered.
 - Default 60 req/min per agent rate limit. Increase on request in beta.
 

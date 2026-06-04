@@ -80,7 +80,7 @@ export interface PaymentClientOptions {
    * endpoint — enables response caching + dedup without any x402 payment
    * flow. Requires `apiKey` (proxy auth is agent-based, not wallet-signed).
    * The agent's original `Authorization` header, if any, is forwarded
-   * upstream via `X-Helix-Upstream-Auth`.
+   * upstream via `X-Gatewards-Upstream-Auth`.
    */
   proxy?: boolean;
 }

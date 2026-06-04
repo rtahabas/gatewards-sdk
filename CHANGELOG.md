@@ -19,6 +19,30 @@ Package-specific changes are tagged `[agent-sdk]`, `[merchant-sdk]`, or
 
 ---
 
+## [0.1.0-beta.5] — 2026-06-04
+
+### Fixed
+
+- **[agent-sdk]** Accept `gw_agent_` API keys — the format the Gatewards
+  gateway now issues. `beta.4` rejected every newly issued key client-side
+  (`INVALID_API_KEY`) before any request was sent. Legacy `ag_` and
+  `hx_agent_` prefixes remain accepted.
+- **[agent-sdk]** Proxy mode headers renamed to match the gateway:
+  `X-Gatewards-Target-Url` / `X-Gatewards-Upstream-Auth` (previously
+  `X-Helix-*`, which the rebranded gateway no longer reads — every proxy
+  call returned 400). The cache-status response header is documented as
+  `x-gatewards-cache`. Breaking only against pre-rebrand gateways, none of
+  which remain deployed.
+
+### Docs
+
+- READMEs updated to the current surface: `createGatewardsTools` (the
+  `HelixPaidTool` example referenced a non-existent export), required
+  `network` option added to the quick-start snippet, `X-Gatewards-Event-Id`
+  webhook idempotency header.
+
+---
+
 ## [0.1.0-beta.4] — 2026-04-18
 
 ### Added

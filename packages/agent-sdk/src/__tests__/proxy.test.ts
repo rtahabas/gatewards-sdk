@@ -135,17 +135,17 @@ describe("applyProxyRewrite", () => {
     });
     expect(out.baseURL).toBe(GATEWAY);
     expect(out.url).toBe("/api/v1/proxy");
-    expect(out.headers.get("X-Helix-Target-Url")).toBe(
+    expect(out.headers.get("X-Gatewards-Target-Url")).toBe(
       "https://api.example.com/data",
     );
     expect(out.headers.get("Authorization")).toBe(`Bearer ${API_KEY}`);
   });
 
-  it("preserves caller Authorization as X-Helix-Upstream-Auth", () => {
+  it("preserves caller Authorization as X-Gatewards-Upstream-Auth", () => {
     const config = fakeConfig({ url: "https://api.example.com/me" });
     config.headers.set("Authorization", "Bearer upstream-secret");
     applyProxyRewrite(config, { gatewayUrl: GATEWAY, apiKey: API_KEY });
-    expect(config.headers.get("X-Helix-Upstream-Auth")).toBe(
+    expect(config.headers.get("X-Gatewards-Upstream-Auth")).toBe(
       "Bearer upstream-secret",
     );
     expect(config.headers.get("Authorization")).toBe(`Bearer ${API_KEY}`);
@@ -162,7 +162,7 @@ describe("applyProxyRewrite", () => {
       apiKey: API_KEY,
     });
     expect(out.params).toBeUndefined();
-    expect(out.headers.get("X-Helix-Target-Url")).toBe(
+    expect(out.headers.get("X-Gatewards-Target-Url")).toBe(
       "https://api.example.com/x?q=hello",
     );
   });
@@ -194,7 +194,7 @@ describe("proxy mode — end-to-end through axios interceptor", () => {
     const out = fulfilled(config);
     expect(out.baseURL).toBe(GATEWAY);
     expect(out.url).toBe("/api/v1/proxy");
-    expect(out.headers.get("X-Helix-Target-Url")).toBe(
+    expect(out.headers.get("X-Gatewards-Target-Url")).toBe(
       "https://api.coingecko.com/simple/price?ids=bitcoin",
     );
     expect(out.headers.get("Authorization")).toBe(`Bearer ${API_KEY}`);

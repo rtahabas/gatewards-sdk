@@ -107,7 +107,7 @@ your receiver would log:
 </p>
 
 HMAC-SHA256 over the JSON body with a per-pipeline secret (AES-GCM at
-rest), idempotency via `X-Helix-Event-Id`, and SSRF guard on the target
+rest), idempotency via `X-Gatewards-Event-Id`, and SSRF guard on the target
 URL. Source: [`scripts/demo-webhook-on-breach.ts`](https://github.com/rtahabas/gatewards/blob/main/scripts/demo-webhook-on-breach.ts).
 
 ## Flow
@@ -138,8 +138,9 @@ npm install @gatewards/agent-sdk
 import { createPaymentClient } from "@gatewards/agent-sdk";
 
 const { client } = createPaymentClient({
-  gatewayUrl: process.env.HELIX_GATEWAY!,
+  gatewayUrl: process.env.GATEWARDS_GATEWAY!,
   apiKey: process.env.GATEWARDS_API_KEY!,
+  network: "base",
   proxy: true, // drop-in proxy mode — no on-chain settlement required
   budgetPolicy: {
     maxSpendPerCall: "1.00", // hard cap per request (USD-equivalent)
@@ -152,7 +153,7 @@ const { client } = createPaymentClient({
 const res = await client.get("https://your-upstream.com/api/data?q=...");
 ```
 
-LangChain integration: `import { HelixPaidTool } from "@gatewards/agent-sdk/langchain"`.
+LangChain integration: `import { createGatewardsTools } from "@gatewards/agent-sdk/langchain"`.
 
 ### Merchant (API provider) — optional, only when you sell paid APIs via x402
 
