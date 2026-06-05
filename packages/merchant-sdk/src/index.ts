@@ -165,7 +165,10 @@ export function createPaymentRequiredMiddleware(
       // omitted jti (older receipts) — nothing to dedup on. A non-finite exp
       // would make the stored entry immortal, so require a usable expiry.
       if (payload.jti && Number.isFinite(payload.exp)) {
-        const claimed = await replayStore.claim(payload.jti, payload.exp * 1000);
+        const claimed = await replayStore.claim(
+          payload.jti,
+          payload.exp * 1000,
+        );
         if (!claimed) {
           return res.status(409).json({ error: "Receipt already used" });
         }
