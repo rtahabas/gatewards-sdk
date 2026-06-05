@@ -42,6 +42,33 @@ export interface PaymentRequiredOptions {
    * Called once per request and cached for consistency.
    */
   resourceResolver?: (req: Request) => string;
+  /**
+   * Store used to detect replayed receipts by their `jti`. A verified receipt
+   * is single-use; without a store a valid receipt could be replayed within
+   * its TTL to consume the endpoint repeatedly for one payment.
+   *
+   * Default: a fresh in-memory store per middleware instance
+   * (`createInMemoryReplayStore`). This is per-process — run multiple replicas
+   * behind a shared store (Redis/DB) by injecting your own implementation.
+   */
+  replayStore?: ReplayStore;
+}
+
+/**
+ * Tracks spent receipt `jti`s so a receipt can only be redeemed once.
+ *
+ * A single `claim` method (rather than separate check + record) keeps the
+ * operation atomic: distributed implementations should claim and test in one
+ * step (e.g. Redis `SET key NX`) so concurrent requests for the same receipt
+ * cannot both pass. May be sync or async.
+ */
+export interface ReplayStore {
+  /**
+   * Atomically record `jti` (expiring at `expiresAtMs`, epoch ms).
+   * Returns `true` if it was newly claimed (proceed), `false` if it was
+   * already present (a replay — reject).
+   */
+  claim(jti: string, expiresAtMs: number): boolean | Promise<boolean>;
 }
 
 // ─── Receipt ────────────────────────────────────────────────────

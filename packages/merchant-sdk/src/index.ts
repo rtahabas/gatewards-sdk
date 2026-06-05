@@ -13,10 +13,36 @@ import {
   PaymentRequiredOptions,
   PaymentReceipt,
   PaidRequest,
+  ReplayStore,
   isValidAddress,
 } from "./types";
 
 const USDC_DECIMALS = 6;
+
+/** Prune expired entries once the store grows past this many jtis. */
+const REPLAY_PRUNE_THRESHOLD = 1000;
+
+/**
+ * Default replay store: an in-process Map of jti → expiry (epoch ms).
+ * Single-process — for multi-replica deployments inject a shared store.
+ */
+export function createInMemoryReplayStore(): ReplayStore {
+  const seen = new Map<string, number>();
+  return {
+    claim(jti: string, expiresAtMs: number): boolean {
+      const now = Date.now();
+      const existing = seen.get(jti);
+      if (existing !== undefined && existing > now) return false;
+      seen.set(jti, expiresAtMs);
+      if (seen.size > REPLAY_PRUNE_THRESHOLD) {
+        for (const [key, exp] of seen) {
+          if (exp <= now) seen.delete(key);
+        }
+      }
+      return true;
+    },
+  };
+}
 
 /** Convert human-readable USDC to smallest units. "0.10" → "100000" */
 function parseUSDCPrice(amount: string): string {
@@ -60,6 +86,7 @@ export function createPaymentRequiredMiddleware(
     audience = "402-merchant",
     maxTimeoutSeconds = 300,
     resourceResolver = (req: Request) => req.originalUrl,
+    replayStore = createInMemoryReplayStore(),
   } = options;
 
   // ─── Validate ───────────────────────────────────────────
@@ -79,14 +106,22 @@ export function createPaymentRequiredMiddleware(
   const priceSmallestUnits = parseUSDCPrice(String(price));
   const normalizedWallet = wallet.toLowerCase();
 
-  return function paymentRequired(
+  return async function paymentRequired(
     req: PaidRequest,
     res: Response,
     next: NextFunction,
   ) {
     const authHeader = req.headers.authorization || "";
     const token = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : null;
-    const resource = resourceResolver(req);
+
+    // This handler is async; a throw here becomes a rejection Express 4 will
+    // not forward, so guard the one user-supplied call that can throw.
+    let resource: string;
+    try {
+      resource = resourceResolver(req);
+    } catch {
+      return res.status(500).json({ error: "Resource resolver failed" });
+    }
 
     if (!token) {
       const paymentRequired = {
@@ -151,6 +186,16 @@ export function createPaymentRequiredMiddleware(
         return res.status(403).json({ error: "Receipt resource mismatch" });
       }
 
+      // Replay guard: a receipt is single-use. Skip only when the gateway
+      // omitted jti (older receipts) — nothing to dedup on. A non-finite exp
+      // would make the stored entry immortal, so require a usable expiry.
+      if (payload.jti && Number.isFinite(payload.exp)) {
+        const claimed = await replayStore.claim(payload.jti, payload.exp * 1000);
+        if (!claimed) {
+          return res.status(409).json({ error: "Receipt already used" });
+        }
+      }
+
       req.paymentReceipt = payload;
       return next();
     } catch (error: unknown) {
@@ -166,5 +211,6 @@ export {
   PaymentRequiredOptions,
   PaymentReceipt,
   PaidRequest,
+  ReplayStore,
   isValidAddress,
 } from "./types";
