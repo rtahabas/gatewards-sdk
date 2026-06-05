@@ -1,6 +1,6 @@
 {
   "name": "@gatewards/merchant-sdk",
-  "version": "0.1.0-beta.3",
+  "version": "0.1.0-beta.4",
   "description": "Optional x402 payment middleware for Express APIs — Gatewards component for on-chain monetization (proxy mode is the default; this is opt-in)",
   "author": "Gatewards",
   "license": "Apache-2.0",

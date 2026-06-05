@@ -55,6 +55,35 @@ app.get(
 | `audience`          | string   |          | Default: `"402-merchant"`                |
 | `maxTimeoutSeconds` | number   |          | Default: `300`                           |
 | `resourceResolver`  | function |          | Default: `req.originalUrl`               |
+| `replayStore`       | object   |          | Default: in-memory (per process)         |
+
+## Replay Protection
+
+A receipt is single-use. Each verified receipt's `jti` is recorded so the same
+receipt cannot be replayed within its TTL to hit a paid endpoint more than once
+(a replay returns `409 Receipt already used`).
+
+The default store is in-memory and **per process** — adequate for a single
+instance. Running multiple replicas, inject a shared store backed by Redis/DB:
+
+```typescript
+createPaymentRequiredMiddleware({
+  price: "0.10",
+  wallet: "0xYourWallet",
+  gatewayPublicKey: process.env.JWT_SECRET,
+  network: "base",
+  replayStore: {
+    // SET ... NX claims the jti only if unseen and returns null otherwise, so
+    // concurrent requests for the same receipt cannot both win — one atomic op.
+    claim: async (jti, expiresAtMs) =>
+      (await redis.set(`jti:${jti}`, "1", "NX", "PXAT", expiresAtMs)) !== null,
+  },
+});
+```
+
+`claim` may be sync or async and must be atomic (claim-and-test in one step,
+e.g. Redis `SET NX`) so concurrent requests for the same receipt can't both
+pass. It returns `true` when the jti was newly claimed, `false` on a replay.
 
 ## Payment Receipt
 

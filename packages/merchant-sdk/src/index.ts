@@ -15,6 +15,7 @@ import {
   PaidRequest,
   isValidAddress,
 } from "./types";
+import { createInMemoryReplayStore } from "./replay-store";
 
 const USDC_DECIMALS = 6;
 
@@ -60,6 +61,7 @@ export function createPaymentRequiredMiddleware(
     audience = "402-merchant",
     maxTimeoutSeconds = 300,
     resourceResolver = (req: Request) => req.originalUrl,
+    replayStore = createInMemoryReplayStore(),
   } = options;
 
   // ─── Validate ───────────────────────────────────────────
@@ -79,14 +81,22 @@ export function createPaymentRequiredMiddleware(
   const priceSmallestUnits = parseUSDCPrice(String(price));
   const normalizedWallet = wallet.toLowerCase();
 
-  return function paymentRequired(
+  return async function paymentRequired(
     req: PaidRequest,
     res: Response,
     next: NextFunction,
   ) {
     const authHeader = req.headers.authorization || "";
     const token = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : null;
-    const resource = resourceResolver(req);
+
+    // This handler is async; a throw here becomes a rejection Express 4 will
+    // not forward, so guard the one user-supplied call that can throw.
+    let resource: string;
+    try {
+      resource = resourceResolver(req);
+    } catch {
+      return res.status(500).json({ error: "Resource resolver failed" });
+    }
 
     if (!token) {
       const paymentRequired = {
@@ -151,6 +161,19 @@ export function createPaymentRequiredMiddleware(
         return res.status(403).json({ error: "Receipt resource mismatch" });
       }
 
+      // Replay guard: a receipt is single-use. Skip only when the gateway
+      // omitted jti (older receipts) — nothing to dedup on. A non-finite exp
+      // would make the stored entry immortal, so require a usable expiry.
+      if (payload.jti && Number.isFinite(payload.exp)) {
+        const claimed = await replayStore.claim(
+          payload.jti,
+          payload.exp * 1000,
+        );
+        if (!claimed) {
+          return res.status(409).json({ error: "Receipt already used" });
+        }
+      }
+
       req.paymentReceipt = payload;
       return next();
     } catch (error: unknown) {
@@ -166,5 +189,7 @@ export {
   PaymentRequiredOptions,
   PaymentReceipt,
   PaidRequest,
+  ReplayStore,
   isValidAddress,
 } from "./types";
+export { createInMemoryReplayStore } from "./replay-store";
