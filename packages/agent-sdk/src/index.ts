@@ -26,6 +26,7 @@ import {
   validateNetwork,
 } from "./validation";
 import { DEFAULT_TIMEOUT_MS } from "./constants";
+import { rejectUnknownOptions } from "./client-options";
 import {
   buildPayload,
   buildRequirements,
@@ -39,6 +40,16 @@ import { applyProxyRewrite } from "./proxy";
 // Re-export public API
 export { createBudgetGuard } from "./budget";
 export { getServices, getPlans, subscribe, getCredits } from "./discovery";
+export type {
+  GetServicesOptions,
+  GetPlansOptions,
+  SubscribeOptions,
+  GetCreditsOptions,
+  ServicesResponse,
+  PlansResponse,
+  SubscribeResponse,
+  CreditsResponse,
+} from "./discovery-types";
 export {
   BudgetPolicy,
   BudgetGuard,
@@ -59,6 +70,7 @@ interface PaidRequestConfig extends InternalAxiosRequestConfig {
 export function createPaymentClient(
   options: PaymentClientOptions,
 ): PaymentClientResult {
+  rejectUnknownOptions(options);
   const {
     gatewayUrl,
     apiKey,
