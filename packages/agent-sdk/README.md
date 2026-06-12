@@ -1,6 +1,7 @@
 # @gatewards/agent-sdk
 
-x402 payment SDK for AI agents. Automatic HTTP 402 handling with managed wallets or self-custody.
+x402 payment SDK for AI agents. Automatic HTTP 402 handling with self-custody
+signing — your keys never leave your process.
 
 ## Installation
 
@@ -8,40 +9,35 @@ x402 payment SDK for AI agents. Automatic HTTP 402 handling with managed wallets
 npm install @gatewards/agent-sdk
 ```
 
-## API Key Mode (Recommended)
+## x402 Payments (Self-Custody)
 
-Platform manages your wallet. You only need an API key from the dashboard.
+The agent signs payments locally with its own wallet. The gateway only
+verifies and settles — it never holds or operates keys.
 
 ```typescript
 import { createPaymentClient } from "@gatewards/agent-sdk";
 
 const { client, budget } = createPaymentClient({
   gatewayUrl: "https://api.gatewards.com",
-  apiKey: process.env.GATEWARDS_API_KEY,
   network: "base",
+  privateKey: process.env.AGENT_PRIVATE_KEY,
+  rpcUrl: "https://mainnet.base.org",
+  usdcAddress: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
   budgetPolicy: {
     maxSpendPerCall: "1.00", // 1 USDC max per request
     dailyLimit: "10.00", // 10 USDC daily
   },
 });
 
-// Auto-pays on 402 responses — no private key needed
+// Auto-pays on 402 responses — signed locally, settled on-chain
 const response = await client.get("https://merchant.example.com/api/data");
 ```
 
-## Self-Custody Mode
-
-Agent manages its own wallet:
-
-```typescript
-const { client, signer } = createPaymentClient({
-  gatewayUrl: "https://api.gatewards.com",
-  network: "base",
-  privateKey: process.env.AGENT_PRIVATE_KEY,
-  rpcUrl: "https://mainnet.base.org",
-  usdcAddress: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
-});
-```
+> **Migrating from 0.1.x:** managed (gateway-signed) mode was removed in
+> v0.2.0 — the gateway no longer signs on your behalf. Register your wallet
+> address with your agent in the dashboard, then pass `privateKey`, `rpcUrl`
+> and `usdcAddress` as above. `apiKey` is now only used for proxy mode and
+> REST calls (budget, subscriptions).
 
 ## Proxy Mode (Cost Optimizer)
 
@@ -110,7 +106,7 @@ try {
         console.log("Limit hit:", err.details);
         break;
       case ErrorCodes.SIGNING_FAILED:
-        console.log("Gateway signing failed");
+        console.log("Local signing failed");
         break;
       case ErrorCodes.SETTLEMENT_FAILED:
         console.log("On-chain transfer failed");
@@ -122,19 +118,17 @@ try {
 
 ## Configuration
 
-| Option         | Type    | Required     | Description                                                      |
-| -------------- | ------- | ------------ | ---------------------------------------------------------------- |
-| `gatewayUrl`   | string  | ✅           | Gatewards gateway URL                                             |
-| `network`      | string  | ✅           | `"base"`, `"base-sepolia"`, `"ethereum"`                         |
-| `apiKey`       | string  | ✅\*         | Agent API key (managed mode)                                     |
-| `privateKey`   | string  | ✅\*         | Private key (self-custody)                                       |
-| `rpcUrl`       | string  | Self-custody | Blockchain RPC                                                   |
-| `usdcAddress`  | string  | Self-custody | USDC contract                                                    |
-| `budgetPolicy` | object  |              | `{ maxSpendPerCall, dailyLimit }` in USDC                        |
-| `timeoutMs`    | number  |              | Default: 30000                                                   |
-| `proxy`        | boolean |              | Route all requests through the gateway cache. Requires `apiKey`. |
-
-\*Either `apiKey` or `privateKey` required, not both.
+| Option         | Type    | Required   | Description                                                      |
+| -------------- | ------- | ---------- | ---------------------------------------------------------------- |
+| `gatewayUrl`   | string  | ✅         | Gatewards gateway URL                                             |
+| `network`      | string  | ✅         | `"base"`, `"base-sepolia"`, `"ethereum"`                         |
+| `privateKey`   | string  | x402 mode  | Private key for local signing (self-custody)                     |
+| `rpcUrl`       | string  | x402 mode  | Blockchain RPC                                                   |
+| `usdcAddress`  | string  | x402 mode  | USDC contract                                                    |
+| `apiKey`       | string  | Proxy mode | Agent API key — only valid with `proxy: true`                    |
+| `budgetPolicy` | object  |            | `{ maxSpendPerCall, dailyLimit }` in USDC                        |
+| `timeoutMs`    | number  |            | Default: 30000                                                   |
+| `proxy`        | boolean |            | Route all requests through the gateway cache. Requires `apiKey`. |
 
 ## Supported Networks
 

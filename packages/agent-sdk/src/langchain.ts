@@ -12,6 +12,9 @@
  * const tools = createGatewardsTools({
  *   gatewayUrl: "https://gateway.gatewards.com",
  *   apiKey: process.env.GATEWARDS_API_KEY!,
+ *   privateKey: process.env.AGENT_PRIVATE_KEY!, // self-custody signing
+ *   rpcUrl: "https://mainnet.base.org",
+ *   usdcAddress: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
  *   network: "base",
  * });
  *
@@ -35,8 +38,17 @@ import type { PaymentClientOptions, PaymentClientResult } from "./types";
 export interface GatewardsToolsOptions {
   /** Gatewards gateway URL. */
   gatewayUrl: string;
-  /** Agent API key (managed wallet mode). */
+  /** Agent API key — used by the REST tools (check_budget, subscribe). */
   apiKey: string;
+  /**
+   * Agent private key for x402 signing (self-custody). Signing happens
+   * locally in call_paid_api — the key is never sent anywhere.
+   */
+  privateKey: string;
+  /** Blockchain RPC URL for the signing wallet. */
+  rpcUrl: string;
+  /** USDC contract address on the target network. */
+  usdcAddress: string;
   /** Network identifier (e.g. "base", "base-sepolia"). */
   network: string;
   /** Base URL of the merchant/service to call. If omitted, call_paid_api expects full URLs. */
@@ -255,10 +267,12 @@ export function createGatewardsTools(
 ): StructuredTool[] {
   const paymentOpts: PaymentClientOptions = {
     gatewayUrl: options.gatewayUrl,
-    apiKey: options.apiKey,
+    privateKey: options.privateKey,
+    rpcUrl: options.rpcUrl,
+    usdcAddress: options.usdcAddress,
     network: options.network,
     budgetPolicy: options.budgetPolicy,
-    axiosConfig: { headers: { "X-Gatewards-SDK": "langchain/0.1.0" } },
+    axiosConfig: { headers: { "X-Gatewards-SDK": "langchain/0.2.0" } },
   };
 
   const payment = createPaymentClient(paymentOpts);

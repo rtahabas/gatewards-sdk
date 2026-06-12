@@ -37,27 +37,32 @@ export interface BudgetGuard {
  * Options for creating a payment client.
  *
  * Two modes:
- * - **API Key mode** (recommended): Set `apiKey`. Platform manages wallet and signing.
- * - **Self-custody mode**: Set `privateKey`, `rpcUrl`, `usdcAddress`. Agent signs locally.
+ * - **x402 mode** (default): self-custody. Set `privateKey`, `rpcUrl`,
+ *   `usdcAddress`. The agent signs payments locally — keys never leave
+ *   the process. (Gateway-managed signing was removed in v0.2.0.)
+ * - **Proxy mode**: Set `proxy: true` and `apiKey`. Routes requests through
+ *   the gateway for caching/dedup — no payment flow, no signing.
  */
 export interface PaymentClientOptions {
   /** Gatewards gateway URL (required). */
   gatewayUrl: string;
 
-  /** Agent API key for managed wallet mode. Obtained from dashboard. */
+  /**
+   * Agent API key. Obtained from dashboard.
+   * Only valid with `proxy: true` — x402 signing is self-custody.
+   */
   apiKey?: string;
 
   /**
-   * Agent private key for self-custody mode.
-   * Must be 0x-prefixed 64-char hex string.
-   * @deprecated Consider using apiKey mode for production.
+   * Agent private key for x402 (self-custody) mode.
+   * Must be 0x-prefixed 64-char hex string. Never sent anywhere.
    */
   privateKey?: string;
 
-  /** Blockchain RPC URL. Required for self-custody mode. */
+  /** Blockchain RPC URL. Required for x402 mode. */
   rpcUrl?: string;
 
-  /** USDC contract address. Required for self-custody mode. */
+  /** USDC contract address. Required for x402 mode. */
   usdcAddress?: string;
 
   /** Network identifier. Required. e.g. "base", "base-sepolia", "ethereum" */
@@ -89,7 +94,7 @@ export interface PaymentClientOptions {
 export interface PaymentClientResult {
   /** Axios instance with x402 payment interceptor. */
   client: import("axios").AxiosInstance;
-  /** Ethers wallet (only available in self-custody mode). */
+  /** Ethers wallet (always set in x402 mode, absent in proxy mode). */
   signer?: import("ethers").Wallet;
   /** Budget guard for tracking spending. */
   budget: BudgetGuard;
@@ -119,15 +124,6 @@ export interface X402SettleResponse {
   receipt: string;
   txHash?: string;
   error?: string;
-}
-
-/** Response from gateway /api/v1/agents/sign-payment endpoint. */
-export interface SignPaymentResponse {
-  signature: string;
-  authorization: TransferAuthorization;
-  network: string;
-  chainId: number;
-  usdcAddress: string;
 }
 
 // ─── Internal Types ─────────────────────────────────────────────
