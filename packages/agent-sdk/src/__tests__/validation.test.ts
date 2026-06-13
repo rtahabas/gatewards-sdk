@@ -22,7 +22,7 @@ describe("Configuration Validation", () => {
     );
   });
 
-  it("throws when neither apiKey nor privateKey", () => {
+  it("throws when privateKey missing in x402 mode", () => {
     expectGatewardsError(
       () =>
         createPaymentClient({
@@ -33,7 +33,21 @@ describe("Configuration Validation", () => {
     );
   });
 
-  it("throws when both apiKey and privateKey provided", () => {
+  it("throws migration error when apiKey passed in x402 mode (managed mode removed)", () => {
+    const err = expectGatewardsError(
+      () =>
+        createPaymentClient({
+          gatewayUrl: "http://localhost:3001",
+          network: "base",
+          apiKey: "ag_test123",
+        }),
+      ErrorCodes.INVALID_CONFIG,
+    );
+    expect(err.message).toContain("removed in v0.2.0");
+    expect(err.message).toContain("self-custody");
+  });
+
+  it("throws migration error when both apiKey and privateKey provided without proxy", () => {
     expectGatewardsError(
       () =>
         createPaymentClient({
@@ -48,12 +62,28 @@ describe("Configuration Validation", () => {
     );
   });
 
-  it("throws on invalid apiKey prefix", () => {
+  it("throws when proxy mode is given a privateKey (unused credential)", () => {
+    const err = expectGatewardsError(
+      () =>
+        createPaymentClient({
+          gatewayUrl: "http://localhost:3001",
+          network: "base",
+          proxy: true,
+          apiKey: "ag_test123",
+          privateKey: "0x" + "a".repeat(64),
+        }),
+      ErrorCodes.INVALID_CONFIG,
+    );
+    expect(err.message).toContain("not used in proxy mode");
+  });
+
+  it("throws on invalid apiKey prefix (proxy mode)", () => {
     expectGatewardsError(
       () =>
         createPaymentClient({
           gatewayUrl: "http://localhost:3001",
           network: "base",
+          proxy: true,
           apiKey: "invalid_prefix",
         }),
       ErrorCodes.INVALID_API_KEY,
@@ -65,6 +95,7 @@ describe("Configuration Validation", () => {
       () =>
         createPaymentClient({
           gatewayUrl: "http://localhost:3001",
+          proxy: true,
           apiKey: "ag_test123",
           network: "",
         }),
@@ -77,6 +108,7 @@ describe("Configuration Validation", () => {
       () =>
         createPaymentClient({
           gatewayUrl: "http://localhost:3001",
+          proxy: true,
           apiKey: "ag_test123",
           network: "nonexistent-chain",
         }),
@@ -84,28 +116,31 @@ describe("Configuration Validation", () => {
     );
   });
 
-  it("accepts ag_ prefixed apiKey", () => {
+  it("accepts ag_ prefixed apiKey (proxy mode)", () => {
     const { client } = createPaymentClient({
       gatewayUrl: "http://localhost:3001",
       network: "base",
+      proxy: true,
       apiKey: "ag_validkey123abc",
     });
     expect(client).toBeDefined();
   });
 
-  it("accepts hx_agent_ prefixed apiKey", () => {
+  it("accepts hx_agent_ prefixed apiKey (proxy mode)", () => {
     const { client } = createPaymentClient({
       gatewayUrl: "http://localhost:3001",
       network: "base",
+      proxy: true,
       apiKey: "hx_agent_validkey123abc",
     });
     expect(client).toBeDefined();
   });
 
-  it("accepts gw_agent_ prefixed apiKey (current gateway format)", () => {
+  it("accepts gw_agent_ prefixed apiKey (proxy mode, current gateway format)", () => {
     const { client } = createPaymentClient({
       gatewayUrl: "http://localhost:3001",
       network: "base",
+      proxy: true,
       apiKey: "gw_agent_0123456789abcdef0123456789abcdef",
     });
     expect(client).toBeDefined();
@@ -125,7 +160,7 @@ describe("Configuration Validation", () => {
     );
   });
 
-  it("throws when self-custody missing rpcUrl", () => {
+  it("throws when x402 mode missing rpcUrl", () => {
     expectGatewardsError(
       () =>
         createPaymentClient({
@@ -133,6 +168,19 @@ describe("Configuration Validation", () => {
           network: "base",
           privateKey: "0x" + "a".repeat(64),
           usdcAddress: "0x" + "b".repeat(40),
+        }),
+      ErrorCodes.INVALID_CONFIG,
+    );
+  });
+
+  it("throws when x402 mode missing usdcAddress", () => {
+    expectGatewardsError(
+      () =>
+        createPaymentClient({
+          gatewayUrl: "http://localhost:3001",
+          network: "base",
+          privateKey: "0x" + "a".repeat(64),
+          rpcUrl: "http://localhost:8545",
         }),
       ErrorCodes.INVALID_CONFIG,
     );
@@ -152,7 +200,7 @@ describe("Configuration Validation", () => {
     );
   });
 
-  it("returns signer in self-custody mode", () => {
+  it("returns signer in x402 (self-custody) mode", () => {
     const { signer } = createPaymentClient({
       gatewayUrl: "http://localhost:3001",
       network: "base",
@@ -165,10 +213,11 @@ describe("Configuration Validation", () => {
     expect(signer!.address).toMatch(/^0x[a-fA-F0-9]{40}$/);
   });
 
-  it("returns no signer in apiKey mode", () => {
+  it("returns no signer in proxy mode", () => {
     const { signer } = createPaymentClient({
       gatewayUrl: "http://localhost:3001",
       network: "base",
+      proxy: true,
       apiKey: "ag_test123",
     });
     expect(signer).toBeUndefined();

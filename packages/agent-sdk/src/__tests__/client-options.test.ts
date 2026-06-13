@@ -9,6 +9,7 @@ const validOptions: PaymentClientOptions = {
   gatewayUrl: GATEWAY,
   apiKey: API_KEY,
   network: "base",
+  proxy: true,
 };
 
 describe("createPaymentClient — unknown option rejection", () => {
@@ -68,10 +69,12 @@ describe("createPaymentClient — unknown option rejection", () => {
     // the unknown-key check must never reject it.
     const result = createPaymentClient({
       gatewayUrl: GATEWAY,
-      apiKey: API_KEY,
+      privateKey: "0x" + "a".repeat(64),
+      rpcUrl: "https://rpc.example.com",
+      usdcAddress: "0x" + "b".repeat(40),
       network: "base",
       budgetPolicy: undefined,
-      axiosConfig: { headers: { "X-Gatewards-SDK": "langchain/0.1.0" } },
+      axiosConfig: { headers: { "X-Gatewards-SDK": "langchain/0.2.0" } },
     });
     expect(result.client).toBeDefined();
   });

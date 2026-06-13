@@ -30,7 +30,6 @@ import { rejectUnknownOptions } from "./client-options";
 import {
   buildPayload,
   buildRequirements,
-  requestGatewaySign,
   signLocally,
   submitSettlement,
 } from "./signing";
@@ -56,7 +55,6 @@ export {
   BudgetState,
   PaymentClientOptions,
   PaymentClientResult,
-  SignPaymentResponse,
   X402PaymentRequired,
   X402SettleResponse,
   GatewardsError,
@@ -90,27 +88,42 @@ export function createPaymentClient(
       "gatewayUrl is required",
       ErrorCodes.INVALID_CONFIG,
     );
-  if (!apiKey && !privateKey)
-    throw new GatewardsError(
-      "Either apiKey or privateKey is required",
-      ErrorCodes.INVALID_CONFIG,
-    );
-  if (apiKey && privateKey)
-    throw new GatewardsError(
-      "Provide either apiKey or privateKey, not both",
-      ErrorCodes.INVALID_CONFIG,
-    );
-  if (apiKey) validateApiKey(apiKey);
-  if (privateKey) {
+  if (proxy) {
+    if (!apiKey)
+      throw new GatewardsError(
+        "proxy mode requires apiKey (proxy auth is agent-based, not wallet-signed)",
+        ErrorCodes.INVALID_CONFIG,
+      );
+    validateApiKey(apiKey);
+    if (privateKey)
+      throw new GatewardsError(
+        "privateKey is not used in proxy mode — remove it. Proxy mode never " +
+          "signs payments; use a separate x402 client if you need both.",
+        ErrorCodes.INVALID_CONFIG,
+      );
+  } else {
+    if (apiKey)
+      throw new GatewardsError(
+        "Managed (gateway-signed) mode was removed in v0.2.0 — x402 signing " +
+          "is self-custody. Provide privateKey, rpcUrl and usdcAddress " +
+          "instead. apiKey is only valid with proxy: true.",
+        ErrorCodes.INVALID_CONFIG,
+      );
+    if (!privateKey)
+      throw new GatewardsError(
+        "privateKey is required — x402 payments are signed locally " +
+          "(self-custody) as of v0.2.0.",
+        ErrorCodes.INVALID_CONFIG,
+      );
     validatePrivateKey(privateKey);
     if (!rpcUrl)
       throw new GatewardsError(
-        "rpcUrl is required for self-custody mode",
+        "rpcUrl is required for x402 mode",
         ErrorCodes.INVALID_CONFIG,
       );
     if (!usdcAddress)
       throw new GatewardsError(
-        "usdcAddress is required for self-custody mode",
+        "usdcAddress is required for x402 mode",
         ErrorCodes.INVALID_CONFIG,
       );
     validateEthereumAddress(usdcAddress, "usdcAddress");
@@ -121,7 +134,6 @@ export function createPaymentClient(
       ErrorCodes.INVALID_CONFIG,
     );
   const resolvedChainId = chainId || validateNetwork(network);
-  const mode: "managed" | "self-custody" = apiKey ? "managed" : "self-custody";
 
   let signer: ethers.Wallet | undefined;
   if (privateKey && rpcUrl)
@@ -130,7 +142,7 @@ export function createPaymentClient(
   const budget = createBudgetGuard(budgetPolicy);
   const sdkId =
     (axiosConfig?.headers as Record<string, string>)?.["X-Gatewards-SDK"] ||
-    "agent-sdk/0.1.0";
+    "agent-sdk/0.2.0";
   const client = axios.create({
     timeout: timeoutMs,
     ...axiosConfig,
@@ -141,13 +153,8 @@ export function createPaymentClient(
   });
 
   if (proxy) {
-    if (!apiKey)
-      throw new GatewardsError(
-        "proxy mode requires apiKey (proxy auth is agent-based, not wallet-signed)",
-        ErrorCodes.INVALID_CONFIG,
-      );
     client.interceptors.request.use((config) =>
-      applyProxyRewrite(config, { gatewayUrl, apiKey }),
+      applyProxyRewrite(config, { gatewayUrl, apiKey: apiKey! }),
     );
     // Proxy mode bypasses x402 entirely — no 402 response interceptor,
     // no signer. Budget guard stays wired so daily spend limits still
@@ -180,49 +187,26 @@ export function createPaymentClient(
       budget.check(amount);
 
       const settleUrl = facilitatorUrl || gatewayUrl;
-      let paymentPayload, paymentRequirements;
 
-      if (mode === "managed") {
-        const signRes = await requestGatewaySign(
-          gatewayUrl,
-          apiKey!,
-          payTo,
-          amount,
-          network,
-        );
-        paymentPayload = buildPayload(
-          network,
-          signRes.signature,
-          signRes.authorization,
-        );
-        paymentRequirements = buildRequirements(
-          network,
-          amount,
-          signRes.usdcAddress,
-          payTo,
-          resource,
-        );
-      } else {
-        const signResult = await signLocally(
-          signer!,
-          resolvedChainId,
-          usdcAddress!,
-          payTo,
-          amount,
-        );
-        paymentPayload = buildPayload(
-          network,
-          signResult.signature,
-          signResult.authorization,
-        );
-        paymentRequirements = buildRequirements(
-          network,
-          amount,
-          usdcAddress!,
-          payTo,
-          resource,
-        );
-      }
+      const signResult = await signLocally(
+        signer!,
+        resolvedChainId,
+        usdcAddress!,
+        payTo,
+        amount,
+      );
+      const paymentPayload = buildPayload(
+        network,
+        signResult.signature,
+        signResult.authorization,
+      );
+      const paymentRequirements = buildRequirements(
+        network,
+        amount,
+        usdcAddress!,
+        payTo,
+        resource,
+      );
 
       const settleResponse = await submitSettlement(
         settleUrl,

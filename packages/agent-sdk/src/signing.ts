@@ -3,7 +3,7 @@ import { ethers } from "ethers";
 import type {
   X402PaymentPayload,
   X402PaymentRequirements,
-  SignPaymentResponse,
+  TransferAuthorization,
 } from "./types";
 import { GatewardsError, ErrorCodes } from "./types";
 import { extractErrorMessage } from "./validation";
@@ -18,7 +18,7 @@ import {
 export function buildPayload(
   network: string,
   signature: string,
-  authorization: SignPaymentResponse["authorization"],
+  authorization: TransferAuthorization,
 ): X402PaymentPayload {
   return {
     x402Version: "1",
@@ -46,28 +46,6 @@ export function buildRequirements(
   };
 }
 
-export async function requestGatewaySign(
-  gatewayUrl: string,
-  apiKey: string,
-  to: string,
-  value: string,
-  network: string,
-): Promise<SignPaymentResponse> {
-  try {
-    const resp = await axios.post<SignPaymentResponse>(
-      `${gatewayUrl}/api/v1/agents/sign-payment`,
-      { to, value, network },
-      { headers: { "x-api-key": apiKey }, timeout: DEFAULT_TIMEOUT_MS },
-    );
-    return resp.data;
-  } catch (err: unknown) {
-    throw new GatewardsError(
-      `Signing failed: ${extractErrorMessage(err)}`,
-      ErrorCodes.SIGNING_FAILED,
-    );
-  }
-}
-
 export async function signLocally(
   signer: ethers.Wallet,
   chainId: number,
@@ -76,7 +54,7 @@ export async function signLocally(
   amount: string,
 ): Promise<{
   signature: string;
-  authorization: SignPaymentResponse["authorization"];
+  authorization: TransferAuthorization;
 }> {
   const now = Math.floor(Date.now() / 1000);
   const nonce = ethers.hexlify(ethers.randomBytes(32));
@@ -94,11 +72,19 @@ export async function signLocally(
     chainId,
     verifyingContract: usdcAddress,
   };
-  const signature = await signer.signTypedData(
-    domain,
-    EIP712_TRANSFER_AUTH_TYPES,
-    authorization,
-  );
+  let signature: string;
+  try {
+    signature = await signer.signTypedData(
+      domain,
+      EIP712_TRANSFER_AUTH_TYPES,
+      authorization,
+    );
+  } catch (err: unknown) {
+    throw new GatewardsError(
+      `Signing failed: ${extractErrorMessage(err)}`,
+      ErrorCodes.SIGNING_FAILED,
+    );
+  }
   return {
     signature,
     authorization: {
