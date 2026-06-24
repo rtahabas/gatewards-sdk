@@ -1,0 +1,53 @@
+{
+  "name": "@gatewards/mcp-server",
+  "version": "0.2.0-beta.1",
+  "description": "MCP server for Gatewards — give any agent governed, non-custodial access to paid APIs (per-agent spend caps, cross-agent dedup, x402 settlement).",
+  "license": "Apache-2.0",
+  "author": "Gatewards",
+  "publishConfig": {
+    "access": "public"
+  },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "gatewards-mcp": "./dist/index.js"
+  },
+  "files": [
+    "dist",
+    "!dist/**/*.map",
+    "README.md",
+    "LICENSE",
+    "NOTICE"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rtahabas/gatewards-sdk.git",
+    "directory": "packages/mcp-server"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "ai-agent",
+    "agent-governance",
+    "spend-governance",
+    "budget-enforcement",
+    "dedup",
+    "non-custodial",
+    "x402",
+    "usdc",
+    "gatewards"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "lint": "tsc --noEmit",
+    "prepublishOnly": "npm run build"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.1",
+    "@gatewards/agent-sdk": "^0.2.0-beta.1",
+    "axios": "^1.8.0"
+  }
+}
