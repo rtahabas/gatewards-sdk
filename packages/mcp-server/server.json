@@ -1,7 +1,7 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.rtahabas/gatewards",
-  "description": "Drop-in spend governance and cross-agent dedup proxy for AI agent fleets. Discover paid APIs, proxy calls through per-agent budget enforcement, check spend, list plans, and settle via x402 (non-custodial — agents keep their own keys).",
+  "description": "Drop-in spend governance + cross-agent dedup proxy for AI agent fleets, with x402 settlement.",
   "title": "Gatewards",
   "websiteUrl": "https://gatewards.com",
   "repository": {
