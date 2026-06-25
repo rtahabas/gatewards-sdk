@@ -1,0 +1,33 @@
+name: Publish to MCP Registry
+
+# Publishes packages/mcp-server/server.json to the official MCP Registry
+# (registry.modelcontextprotocol.io) under the io.github.rtahabas namespace.
+#
+# Manual trigger only. Run this AFTER the matching @gatewards/mcp-server version
+# is live on npm WITH the `mcpName` field — the registry validates package
+# ownership by reading mcpName from the published npm tarball.
+
+on:
+  workflow_dispatch:
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packages/mcp-server
+    permissions:
+      id-token: write # required for GitHub OIDC auth to the registry
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Install mcp-publisher
+        run: curl -L "https://github.com/modelcontextprotocol/registry/releases/latest/download/mcp-publisher_$(uname -s | tr '[:upper:]' '[:lower:]')_$(uname -m | sed 's/x86_64/amd64/;s/aarch64/arm64/').tar.gz" | tar xz mcp-publisher
+
+      - name: Authenticate to MCP Registry (GitHub OIDC)
+        run: ./mcp-publisher login github-oidc
+
+      - name: Publish server to MCP Registry
+        run: ./mcp-publisher publish
