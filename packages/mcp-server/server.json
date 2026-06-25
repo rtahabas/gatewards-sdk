@@ -1,0 +1,38 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.rtahabas/gatewards",
+  "description": "Drop-in spend governance and cross-agent dedup proxy for AI agent fleets. Discover paid APIs, proxy calls through per-agent budget enforcement, check spend, list plans, and settle via x402 (non-custodial — agents keep their own keys).",
+  "title": "Gatewards",
+  "websiteUrl": "https://gatewards.com",
+  "repository": {
+    "url": "https://github.com/rtahabas/gatewards-sdk",
+    "source": "github",
+    "subfolder": "packages/mcp-server"
+  },
+  "version": "0.2.0-beta.2",
+  "packages": [
+    {
+      "registryType": "npm",
+      "registryBaseUrl": "https://registry.npmjs.org",
+      "identifier": "@gatewards/mcp-server",
+      "version": "0.2.0-beta.2",
+      "transport": {
+        "type": "stdio"
+      },
+      "environmentVariables": [
+        {
+          "name": "GATEWARDS_API_KEY",
+          "description": "Gatewards agent API key (gw_agent_…). Required for authenticated proxy calls; the server starts without it but cannot reach the gateway.",
+          "isRequired": false,
+          "isSecret": true
+        },
+        {
+          "name": "GATEWARDS_GATEWAY_URL",
+          "description": "Gateway base URL. Defaults to http://localhost:3001; set to https://api.gatewards.com for the hosted gateway.",
+          "isRequired": false,
+          "isSecret": false
+        }
+      ]
+    }
+  ]
+}
