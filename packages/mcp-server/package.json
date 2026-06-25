@@ -1,6 +1,7 @@
 {
   "name": "@gatewards/mcp-server",
-  "version": "0.2.0-beta.1",
+  "version": "0.2.0-beta.2",
+  "mcpName": "io.github.rtahabas/gatewards",
   "description": "MCP server for Gatewards — give any agent governed, non-custodial access to paid APIs (per-agent spend caps, cross-agent dedup, x402 settlement).",
   "license": "Apache-2.0",
   "author": "Gatewards",
