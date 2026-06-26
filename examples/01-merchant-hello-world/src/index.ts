@@ -5,12 +5,12 @@
 // a JWT receipt — the middleware verifies and hands control to the handler.
 
 import express from "express";
-import { createPaymentRequiredMiddleware } from "@gatewards/merchant-sdk";
+import { createPaymentRequiredMiddleware, type PaidRequest } from "@gatewards/merchant-sdk";
 
 const PORT = Number(process.env.PORT ?? 4000);
 const WALLET = process.env.MERCHANT_WALLET;
 const JWT_KEY = process.env.GATEWAY_JWT_SECRET;
-const FACILITATOR = process.env.FACILITATOR_URL ?? "https://api.rtahabas.com";
+const FACILITATOR = process.env.FACILITATOR_URL ?? "https://api.gatewards.com";
 
 if (!WALLET || !JWT_KEY) {
   console.error(
@@ -30,7 +30,7 @@ app.get(
     gatewayPublicKey: JWT_KEY,
     facilitatorUrl: FACILITATOR,
   }),
-  (req, res) => {
+  (req: PaidRequest, res) => {
     res.json({
       quote: 42.17,
       paidBy: req.paymentReceipt?.sub,

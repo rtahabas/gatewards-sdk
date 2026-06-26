@@ -8,7 +8,7 @@
 
 import { createPaymentClient, GatewardsError } from "@gatewards/agent-sdk";
 
-const GATEWAY = process.env.HELIX_GATEWAY_URL ?? "https://api.rtahabas.com";
+const GATEWAY = process.env.GATEWARDS_GATEWAY_URL ?? "https://api.gatewards.com";
 const MERCHANT_URL = process.env.MERCHANT_URL;
 
 const agents = [

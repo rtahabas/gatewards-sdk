@@ -5,7 +5,7 @@
 
 import { createPaymentClient } from "@gatewards/agent-sdk";
 
-const GATEWAY = process.env.HELIX_GATEWAY_URL ?? "https://api.rtahabas.com";
+const GATEWAY = process.env.GATEWARDS_GATEWAY_URL ?? "https://api.gatewards.com";
 const API_KEY = process.env.GATEWARDS_API_KEY;
 const MERCHANT_URL = process.env.MERCHANT_URL;
 
@@ -31,4 +31,4 @@ console.log(
 const res = await client.get(`${MERCHANT_URL}/premium/quote`);
 
 console.log("got:", res.data);
-console.log("budget remaining today:", budget.remainingDaily());
+console.log("daily spent so far (USDC smallest units):", budget.getState().dailySpent);
