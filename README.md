@@ -20,14 +20,9 @@ Dashboards and alerts tell you after it happens. Gatewards stops it mid-chain.
 
 You set a daily cap on a fleet. The fleet starts working. The cap hits.
 The gateway atomically blocks the rest and lands a signed webhook at your
-URL — all in one continuous run:
+URL — all in one continuous run.
 
-<p align="center">
-  <img src="./assets/end-to-end-demo.gif" alt="Gatewards end-to-end demo — operator sets cap, fleet works, cap hits, atomic guard fires, signed webhook lands at operator URL" width="780"/>
-</p>
-
-The three guards are also runnable in isolation if you want to verify
-each one separately.
+Each of the three guards is shown in isolation below.
 
 ### Fleet budget cap
 
@@ -100,11 +95,7 @@ repo, [`scripts/demo-loop-detection.ts`](https://github.com/rtahabas/gatewards/b
 When a guard fires, the gateway delivers a signed webhook to your URL
 of choice — what wakes you up at 3am instead of the API invoice. The
 demo intercepts the outbound POST so you can see the exact payload
-your receiver would log:
-
-<p align="center">
-  <img src="./assets/webhook-breach-demo.gif" alt="Gatewards webhook on breach demo — fleet hits cap, gateway delivers HMAC-SHA256 signed POST with the breach payload" width="720"/>
-</p>
+your receiver would log.
 
 HMAC-SHA256 over the JSON body with a per-pipeline secret (AES-GCM at
 rest), idempotency via `X-Gatewards-Event-Id`, and SSRF guard on the target
