@@ -21,7 +21,7 @@ Runnable examples for the Gatewards SDKs. Each folder is an independent
 All examples assume Node 20+ and a Gatewards dashboard account. If you
 don't have one yet, see the [main repo](https://github.com/rtahabas/gatewards)
 for a self-host Docker Compose setup, or use the hosted gateway at
-`https://api.rtahabas.com`.
+`https://api.gatewards.com`.
 
 Every example ships a `.env.example` — copy to `.env` and fill in the
 values it lists. No example reads secrets from anywhere else.
